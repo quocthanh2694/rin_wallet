@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rin_wallet/src/sample_feature/sample_item_list_view.dart';
 import 'package:rin_wallet/src/ui/page/settingsPage.dart';
+import 'package:rin_wallet/src/ui/page/login.dart';
 
 class BottomNavigationBarMain extends StatefulWidget {
   const BottomNavigationBarMain({super.key});
@@ -15,12 +16,13 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    const SampleItemListView(),
+    SampleItemListView(),
     Text(
       'Index 1: Business',
       style: optionStyle,
     ),
-    const SettingPage(),
+    SettingPage(),
+    LoginPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -39,6 +41,7 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -51,6 +54,10 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
             label: 'School',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
           ),
         ],
         currentIndex: _selectedIndex,
