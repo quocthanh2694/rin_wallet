@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-enum CurrencyUnit { dollar, vnd }
-
 enum TransactionType { withdraw, deposit, transfer }
 
 const kDefaultPadding = EdgeInsets.all(16);

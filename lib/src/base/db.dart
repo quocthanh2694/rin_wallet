@@ -32,10 +32,10 @@ class DbHelper {
         dateTime text,
         currencyUnit text,
         description text,
-        initialAmount real,
-        totalDeposit real,
-        totalWithdraw real,
-        balance real
+        initialAmount int,
+        totalDeposit int,
+        totalWithdraw int,
+        balance int
       )
       """);
   }
@@ -44,7 +44,7 @@ class DbHelper {
     Database db = await this.db;
     var result = await db.query("wallets");
     List<Wallet> list = List.generate(result.length, (i) {
-      dynamic item = result[i];
+      // dynamic item = result[i];
       // return new Wallet(item);
       return Wallet.fromObject(result[i]);
     });

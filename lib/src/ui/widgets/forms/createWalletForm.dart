@@ -1,13 +1,12 @@
 // Create a Form widget.
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:rin_wallet/src/base/db.dart';
-import 'package:rin_wallet/src/constant/constant.dart';
-import 'package:rin_wallet/src/models/appStore.dart';
-import 'package:provider/provider.dart';
+import 'package:rin_wallet/src/models/currency_unit.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
+import 'package:rin_wallet/src/models/wallet_type.dart';
+import 'package:rin_wallet/src/utils/number.utils.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateWalletForm extends StatefulWidget {
@@ -24,19 +23,31 @@ class CreateWalletForm extends StatefulWidget {
 class CreateWalletFormState extends State<CreateWalletForm> {
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
+
+  final walletType = WalletType();
+  final currencyUnit = CurrencyUnit();
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
-  final walletTypeController = TextEditingController();
-  final currencyUnitController = TextEditingController();
+  late TextEditingController walletTypeController;
+  late TextEditingController currencyUnitController;
   final descriptionController = TextEditingController();
   final initialAmountController = TextEditingController(text: '0');
   final dateTimeController =
       TextEditingController(text: DateTime.now().toString());
 
   var dbHelper = new DbHelper();
+
+  @override
+  void initState() {
+    walletTypeController =
+        TextEditingController(text: walletType.getList()[0].id);
+    currencyUnitController =
+        TextEditingController(text: currencyUnit.getList()[0].id);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +78,16 @@ class CreateWalletFormState extends State<CreateWalletForm> {
                 TextFormField(
                   controller: initialAmountController,
                   keyboardType: TextInputType.number,
+                  onChanged: (string) {
+                    String _onlyDigits =
+                        string.replaceAll(RegExp('[^0-9]'), "");
+                    String _newTxt = formatNumber(_onlyDigits);
+                    initialAmountController.value = TextEditingValue(
+                      text: _newTxt,
+                      selection:
+                          TextSelection.collapsed(offset: _newTxt.length),
+                    );
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Required';
@@ -79,9 +100,10 @@ class CreateWalletFormState extends State<CreateWalletForm> {
                   ),
                 ),
                 DropdownButtonFormField(
-                  items: CurrencyUnit.values.map((item) {
+                  value: currencyUnitController.text,
+                  items: currencyUnit.getList().map((item) {
                     return DropdownMenuItem<String>(
-                      value: item.name,
+                      value: item.id,
                       child: Text(item.name),
                     );
                   }).toList(),
@@ -101,10 +123,11 @@ class CreateWalletFormState extends State<CreateWalletForm> {
                   ),
                 ),
                 DropdownButtonFormField(
-                  items: <String>['walletType 1', 'walletTYpe 2'].map((item) {
+                  value: walletTypeController.text,
+                  items: walletType.getList().map((item) {
                     return DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
+                      value: item.id,
+                      child: Text(item.name),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -191,8 +214,9 @@ class CreateWalletFormState extends State<CreateWalletForm> {
                             dateTime: DateTime.parse(dateTimeController.text),
                             currencyUnit: currencyUnitController.text,
                             description: descriptionController.text,
-                            initialAmount:
-                                double.parse(initialAmountController.text),
+                            initialAmount: double.parse(initialAmountController
+                                .text
+                                .replaceAll(',', '')),
                           );
 
                           // appStore.addWallet(wallet);

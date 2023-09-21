@@ -1,8 +1,3 @@
-import 'dart:ffi';
-import 'package:rin_wallet/src/constant/constant.dart';
-import 'package:rin_wallet/src/models/transaction.dart';
-import 'package:rin_wallet/src/models/walletType.dart';
-import 'package:uuid/uuid.dart';
 
 class Wallet {
   // required
