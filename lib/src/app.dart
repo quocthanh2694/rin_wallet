@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:rin_wallet/src/models/appStore.dart';
 import 'package:rin_wallet/src/models/cart.dart';
 import 'package:rin_wallet/src/models/catalog.dart';
 import 'package:rin_wallet/src/ui/layout/bottomNavigationBar.dart';
@@ -45,6 +46,18 @@ class MyApp extends StatelessWidget {
                 return cart;
               },
             ),
+            // ChangeNotifierProxyProvider<AppStoreModel>,
+
+
+            // Provider(create: (context) => AppStoreModel()),
+            // ChangeNotifierProxyProvider< CartModel>(
+            //   create: (context) => CartModel(),
+            //   update: (context, catalog, cart) {
+            //     if (cart == null) throw ArgumentError.notNull('cart');
+            //     cart.catalog = catalog;
+            //     return cart;
+            //   },
+            // ),
           ],
           child: MaterialApp(
             home: BottomNavigationBarMain(),

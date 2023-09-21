@@ -1,16 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/cart.dart';
 import 'package:rin_wallet/src/models/catalog.dart';
+import 'package:rin_wallet/src/services/sharedPreferences.service.dart';
 import 'package:rin_wallet/src/ui/page/walletDetailPage.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class Test {
   int id = 0;
@@ -39,6 +44,7 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   int _counter = 0;
   File? imageFile;
+  var dbHelper = new DbHelper();
 
   void _incrementCounter() {
     setState(() {
@@ -58,6 +64,45 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  _requestPermission() async {
+    var status = await Permission.manageExternalStorage.status;
+    if (status!.isRestricted) {
+      status = await Permission.manageExternalStorage.request();
+    }
+
+    if (status!.isDenied) {
+      status = await Permission.manageExternalStorage.request();
+    }
+    if (status!.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.green,
+        content:
+            Text('Please add permission for app to manage external storage'),
+      ));
+    }
+    await Permission.storage.request();
+  }
+
+  _onRestoreDb() async {
+    await _requestPermission();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    String? path = result?.files.single.path;
+
+    if (path != null) {
+      dbHelper.restoreDB(path);
+    }
+  }
+
+  _onBackupDb() async {
+    await _requestPermission();
+
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    if (selectedDirectory == null) return;
+
+    dbHelper.backupDB(selectedDirectory);
+  }
+
   @override
   Widget build(BuildContext context) {
     var data = SettingPage().getItems();
@@ -75,6 +120,29 @@ class _SettingPageState extends State<SettingPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                ElevatedButton(
+                  child: const Text('Backup DB'),
+                  onPressed: () {
+                    _onBackupDb();
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text('Restore DB'),
+                  onPressed: () {
+                    _onRestoreDb();
+                  },
+                ),
+                TextButton(
+                  onPressed: () => {saveStorage('{a: 1; b: 2}')},
+                  child: const Text('Save storage'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final data = await getStorage();
+                    print(data);
+                  },
+                  child: const Text('Get storage'),
+                ),
                 TextButton(
                   onPressed: _addToCart,
                   child: const Text('Add item to cart'),
@@ -261,9 +329,33 @@ class _SettingPageState extends State<SettingPage> {
       maxHeight: 1800,
     )) as XFile;
     if (pickedFile != null) {
-      setState(() {
-        imageFile = File(pickedFile.path);
-      });
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio16x9
+        ],
+        uiSettings: [
+          AndroidUiSettings(
+              toolbarTitle: 'Cropper',
+              toolbarColor: Colors.deepOrange,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          IOSUiSettings(
+            title: 'Cropper',
+          ),
+          WebUiSettings(
+            context: context,
+          ),
+        ],
+      );
+      if (croppedFile!.path.isNotEmpty) {
+        setState(() => imageFile = File(croppedFile.path as String));
+      }
     }
   }
 }

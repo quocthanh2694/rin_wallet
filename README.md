@@ -28,3 +28,8 @@ the `lib/src/localization` directory.
 To support additional languages, please visit the tutorial on
 [Internationalizing Flutter
 apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
+
+
+## TODO
+- Setup permission for ios: https://pub.dev/packages/permission_handler
+- setup folder picker: https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup#android
