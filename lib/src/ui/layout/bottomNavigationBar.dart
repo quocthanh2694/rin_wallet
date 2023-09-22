@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rin_wallet/src/sample_feature/sample_item_list_view.dart';
-import 'package:rin_wallet/src/ui/page/homePage.dart';
+import 'package:rin_wallet/src/ui/page/home_page.dart';
 import 'package:rin_wallet/src/ui/page/settingsPage.dart';
 import 'package:rin_wallet/src/ui/page/login.dart';
 

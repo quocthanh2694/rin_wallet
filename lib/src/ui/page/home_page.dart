@@ -7,7 +7,7 @@ import 'package:rin_wallet/src/models/cart.dart';
 import 'package:rin_wallet/src/models/catalog.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
-import 'package:rin_wallet/src/ui/page/addWalletPage.dart';
+import 'package:rin_wallet/src/ui/page/add_wallet_page.dart';
 import 'package:rin_wallet/src/ui/page/walletDetailPage.dart';
 import 'package:rin_wallet/src/ui/widgets/walletCard.dart';
 
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
           // Providing a restorationId allows the ListView to restore the
           // scroll position when a user leaves and returns to the app after it
           // has been killed while running in the background.
-          restorationId: 'sampleItemListView',
+          restorationId: 'homePageList',
           itemCount: wallets.length,
           itemBuilder: (BuildContext context, int index) {
             final item = wallets[index];

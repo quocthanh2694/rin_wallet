@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:intl/intl.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
+import 'package:rin_wallet/src/models/transaction.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -32,10 +33,23 @@ class DbHelper {
         dateTime text,
         currencyUnit text,
         description text,
-        initialAmount int,
-        totalDeposit int,
-        totalWithdraw int,
-        balance int
+        initialAmount double,
+        totalDeposit double,
+        totalWithdraw double,
+        balance double
+      )
+      """);
+
+    await db.execute("""
+      Create table transactions(
+        id text primary key, 
+        walletId text,
+        amount double
+        walletTransactionTypeId text,
+        categoryId string,
+        description string,
+        dateTime text,
+        imgUrl string
       )
       """);
   }
@@ -49,6 +63,13 @@ class DbHelper {
       return Wallet.fromObject(result[i]);
     });
     return list;
+  }
+
+  Future<Wallet> getWalletById(String id) async {
+    Database db = await this.db;
+    List<Map> result =
+        await db.rawQuery("SELECT * from wallets WHERE id=?", [id]);
+    return Wallet.fromObject(result[0]);
   }
 
   Future<int> insertWallet(Wallet wallet) async {
@@ -70,6 +91,21 @@ class DbHelper {
     // return result;
   }
 
+  //#region Transactions
+  Future<List<WalletTransaction>> getTransactions(String walletId) async {
+    Database db = await this.db;
+    List<Map> result = await db
+        .rawQuery("SELECT * from transactions WHERE walletId=?", [walletId]);
+
+    List<WalletTransaction> list = List.generate(result.length, (i) {
+      return WalletTransaction.fromObject(result[i]);
+    });
+
+    return list;
+  }
+  //#endregion
+
+  //#region Backup & Restore
   Future<void> backupDB(String destinationPath) async {
     String dbPath = join(await getDatabasesPath(), "rin_wallet_db.db");
     var file = File(dbPath);
@@ -83,4 +119,5 @@ class DbHelper {
     await file.copy(await getDatabasesPath() + "/${"rin_wallet_db.db"}");
     print('...Restored!!!!');
   }
+  //#endregion
 }

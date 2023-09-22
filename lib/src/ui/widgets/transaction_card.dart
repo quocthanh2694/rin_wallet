@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rin_wallet/src/constant/constant.dart';
+import 'package:rin_wallet/src/models/transaction.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/ui/page/transaction_page.dart';
 import 'package:rin_wallet/src/utils/datetime.util.dart';
 import 'package:rin_wallet/src/utils/number.utils.dart';
 
-class WalletCard extends StatelessWidget {
+class TransactionCard extends StatelessWidget {
   final VoidCallback onPressed;
-  final Wallet wallet;
+  final WalletTransaction transaction;
 
-  const WalletCard({super.key, required this.wallet, required this.onPressed});
+  const TransactionCard(
+      {super.key, required this.transaction, required this.onPressed});
   @override
   Widget build(BuildContext context) {
-    if (wallet == null) return Container();
+    if (transaction == null) return Container();
 
     return InkWell(
       borderRadius: BorderRadius.circular(radiusSm),
@@ -28,12 +30,12 @@ class WalletCard extends StatelessWidget {
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
-                  "${this.wallet.name}",
+                  "${this.transaction.description}",
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
 
                 Text(
-                  "${formatNumber(trailingZero(wallet.balance ?? 0.0))}${this.wallet.currencyUnit == '\$' ? '\$' : ''}",
+                  "${formatNumber(trailingZero(transaction.amount ?? 0.0))}",
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 // Text(
@@ -41,12 +43,12 @@ class WalletCard extends StatelessWidget {
                 //   style: Theme.of(context).textTheme.headlineSmall,
                 // ),
               ]),
-              wallet.description!.isNotEmpty
+              transaction.description!.isNotEmpty
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "${wallet.description}",
+                          "${transaction.description}",
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -56,7 +58,7 @@ class WalletCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    formatDateTime(this.wallet.dateTime),
+                    formatDateTime(transaction.dateTime),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -77,7 +79,7 @@ class WalletCard extends StatelessWidget {
           context,
           MaterialPageRoute(
               builder: (context) => TransactionPage(
-                    walletId: this.wallet.id,
+                    walletId: this.transaction.id,
                   )),
         );
       },

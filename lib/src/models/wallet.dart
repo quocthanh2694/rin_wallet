@@ -1,4 +1,3 @@
-
 class Wallet {
   // required
   late String id;
@@ -15,9 +14,7 @@ class Wallet {
   double? totalDeposit;
   double? totalWithdraw;
   double? balance;
-  // List<String>? transactionIds = [];
 
-//  Map<String, Object?> map,
   Wallet({
     required this.id,
     required this.name,
@@ -50,7 +47,7 @@ class Wallet {
     this.id = o["id"];
     this.name = o["name"];
     this.walletTypeId = o["walletTypeId"];
-    this.dateTime =  DateTime.parse(o["dateTime"]);
+    this.dateTime = DateTime.parse(o["dateTime"]);
     this.currencyUnit = o["currencyUnit"];
     this.description = o["description"];
     this.initialAmount = o["initialAmount"];
@@ -58,17 +55,4 @@ class Wallet {
     this.totalWithdraw = o["totalWithdraw"];
     this.balance = o["balance"];
   }
-
-  // Wallet.fromObject(dynamic o) {
-  //   this.id = o["id"];
-  //   this.name = o["name"];
-  //   this.walletTypeId = o["walletTypeId"];
-  //   this.dateTime = o["dateTime"];
-  //   this.currencyUnit = o["currencyUnit"];
-  //   this.description = o["description"];
-  //   this.initialAmount = o["initialAmount"];
-  //   this.totalDeposit = o["totalDeposit"];
-  //   this.totalWithdraw = o["totalWithdraw"];
-  //   this.balance = o["balance"];
-  // }
 }
