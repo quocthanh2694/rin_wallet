@@ -2,8 +2,8 @@ class WalletTransaction {
   late String id;
   late String walletId;
   late double amount;
-  late String walletTransactionTypeId; // ref TransactionType
-  late String categoryId; // ref Category
+  late String walletTransactionTypeId;
+  late String categoryId;
 
   // optional
   String? description = '';
@@ -25,11 +25,11 @@ class WalletTransaction {
     var map = Map<String, dynamic>();
     map["walletId"] = walletId;
     map["amount"] = amount;
-    map["transactionTypeId"] = walletTransactionTypeId;
+    map["walletTransactionTypeId"] = walletTransactionTypeId;
     map["categoryId"] = categoryId;
     map["description"] = description;
     map["imgUrl"] = imgUrl;
-    map["dateTime"] = dateTime;
+    map["dateTime"] = dateTime.toString();
     if (id != null) {
       map["id"] = id;
     }
@@ -41,10 +41,13 @@ class WalletTransaction {
     id = o["id"];
     walletId = o["walletId"];
     amount = o["amount"];
-    walletTransactionTypeId = o["transactionTypeId"];
+    walletTransactionTypeId = o["walletTransactionTypeId"];
     categoryId = o["categoryId"];
     description = o["description"];
     dateTime = DateTime.parse(o["dateTime"]);
-    imgUrl = o["imgUrl"];
+    imgUrl = List.generate(o["imgUrl"].length, (i) {
+      print(o["imgUrl"][i]);
+      return o["imgUrl"][i];
+    });
   }
 }

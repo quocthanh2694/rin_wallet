@@ -31,7 +31,8 @@ class _TransactionPageState extends State<TransactionPage> {
 
   getWalletById() async {
     if (widget.walletId!.isEmpty) return;
-    Wallet data = await dbHelper.getWalletById(widget.walletId!);
+    Wallet? data = await dbHelper.getWalletById(widget.walletId!);
+    if (data == null) return;
     setState(() {
       this.wallet = data;
     });
@@ -73,7 +74,8 @@ class _TransactionPageState extends State<TransactionPage> {
         key: _refreshIndicatorKey,
         strokeWidth: 4.0,
         onRefresh: () async {
-          await getWalletById();
+          getWalletById();
+          getTransactions();
         },
         child: ListView(
           children: [
@@ -87,21 +89,84 @@ class _TransactionPageState extends State<TransactionPage> {
               itemBuilder: (BuildContext context, int index) {
                 final item = transactions[index];
 
-                return Column(
-                  children: [
-                    ListTile(
-                        title: Padding(
-                          padding: EdgeInsets.all(1),
-                          child: TransactionCard(
-                              transaction: item, onPressed: () => {}),
+                return Dismissible(
+                  // Each Dismissible must contain a Key. Keys allow Flutter to
+                  // uniquely identify widgets.
+                  direction: DismissDirection.startToEnd,
+                  key: Key(item.id),
+                  // Provide a function that tells the app
+                  // what to do after an item has been swiped away.
+                  confirmDismiss: (DismissDirection direction) async {
+                    return await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirm"),
+                          content: const Text(
+                              "Are you sure you wish to delete this item?"),
+                          actions: <Widget>[
+                            TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text("DELETE")),
+                            MaterialButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text("CANCEL"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  onDismissed: (direction) async {
+                    // Remove the item from the data source.
+                    setState(() {
+                      transactions.removeAt(index);
+                    });
+
+                    await dbHelper.deleteTransaction(item.id);
+
+                    // Then show a snackbar.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Deleted successfull!')));
+                  },
+                  // Show a red background as the item is swiped away.
+                  background: Container(
+                    color: Colors.red,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                              child: Text(
+                            'Delete',
+                            style: Theme.of(context)
+                                .textTheme
+                                .apply(
+                                    bodyColor:
+                                        Theme.of(context).dialogBackgroundColor)
+                                .headlineSmall,
+                          )),
                         ),
-                        leading: const CircleAvatar(
-                          // Display the Flutter Logo image asset.
-                          foregroundImage:
-                              AssetImage('assets/images/flutter_logo.png'),
-                        ),
-                        onTap: () {}),
-                  ],
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                          title: Padding(
+                            padding: EdgeInsets.all(1),
+                            child: TransactionCard(
+                                transaction: item, onPressed: () => {}),
+                          ),
+                          leading: const CircleAvatar(
+                            // Display the Flutter Logo image asset.
+                            foregroundImage:
+                                AssetImage('assets/images/flutter_logo.png'),
+                          ),
+                          onTap: () {}),
+                    ],
+                  ),
                 );
               },
             ),

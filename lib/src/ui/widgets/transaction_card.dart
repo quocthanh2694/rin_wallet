@@ -74,14 +74,17 @@ class TransactionCard extends StatelessWidget {
               // )
             ],
           )),
+      // onLongPress: (){
+
+      // },
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => TransactionPage(
-                    walletId: this.transaction.id,
-                  )),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) => TransactionPage(
+        //             walletId: this.transaction.id,
+        //           )),
+        // );
       },
     );
   }

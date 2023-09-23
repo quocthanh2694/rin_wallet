@@ -1,8 +1,12 @@
 // Create a Form widget.
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:rin_wallet/src/base/db.dart';
+import 'package:rin_wallet/src/models/transaction.dart';
+import 'package:rin_wallet/src/models/transaction_category.dart';
 import 'package:rin_wallet/src/models/currency_unit.dart';
+import 'package:rin_wallet/src/models/transaction_type.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/models/wallet_type.dart';
 import 'package:rin_wallet/src/utils/number.utils.dart';
@@ -25,13 +29,15 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
 
-  final walletType = WalletType();
+  final transactionType = TransactionType();
+  final transactionCategory = TransactionCategory();
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
-  late TextEditingController walletTypeController;
+  late TextEditingController transactionTypeController;
+  late TextEditingController transactionCategoryController;
   late TextEditingController walletController = TextEditingController();
   final descriptionController = TextEditingController();
   final initialAmountController = TextEditingController(text: '0');
@@ -54,8 +60,12 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
   void initState() {
     getWallets();
 
-    walletTypeController =
-        TextEditingController(text: walletType.getList()[0].id);
+    transactionTypeController =
+        TextEditingController(text: transactionType.getList()[0].id);
+
+    transactionCategoryController =
+        TextEditingController(text: transactionCategory.getList()[0].id);
+
     super.initState();
   }
 
@@ -107,8 +117,8 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                   ),
                 ),
                 DropdownButtonFormField(
-                  value: walletTypeController.text,
-                  items: walletType.getList().map((item) {
+                  value: transactionTypeController.text,
+                  items: transactionType.getList().map((item) {
                     return DropdownMenuItem<String>(
                       value: item.id,
                       child: Text(item.name),
@@ -116,7 +126,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                   }).toList(),
                   onChanged: (val) {
                     print(val);
-                    walletTypeController.text = val.toString();
+                    transactionTypeController.text = val.toString();
                   },
                   validator: (value) {
                     if (value == null) {
@@ -126,20 +136,19 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                   },
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
-                    labelText: 'Transaction Type.....',
+                    labelText: 'Transaction Type',
                   ),
                 ),
-                 DropdownButtonFormField(
-                  value: walletTypeController.text,
-                  items: walletType.getList().map((item) {
+                DropdownButtonFormField(
+                  value: transactionCategoryController.text,
+                  items: transactionCategory.getList().map((item) {
                     return DropdownMenuItem<String>(
                       value: item.id,
                       child: Text(item.name),
                     );
                   }).toList(),
                   onChanged: (val) {
-                    print(val);
-                    walletTypeController.text = val.toString();
+                    transactionCategoryController.text = val.toString();
                   },
                   validator: (value) {
                     if (value == null) {
@@ -149,7 +158,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                   },
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
-                    labelText: 'Category Type.....',
+                    labelText: 'Category Type',
                   ),
                 ),
                 TextFormField(
@@ -197,27 +206,26 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                           // you'd often call a server or save the information in a database.
 
                           // print(_formKey);
-                          print(walletTypeController.text);
-                          Wallet wallet = Wallet(
+                          WalletTransaction _transaction = WalletTransaction(
                             id: (new Uuid()).v1(),
-                            name: nameController.text,
-                            walletTypeId: (new Uuid()).v1(),
-                            dateTime: DateTime.parse(dateTimeController.text),
-                            currencyUnit: walletController.text,
                             description: descriptionController.text,
-                            initialAmount: double.parse(initialAmountController
-                                .text
+                            amount: double.parse(initialAmountController.text
                                 .replaceAll(',', '')),
+                            walletId: walletController.text,
+                            walletTransactionTypeId:
+                                transactionTypeController.text,
+                            categoryId: transactionCategoryController.text,
+                            dateTime: DateTime.parse(dateTimeController.text),
                           );
 
                           // appStore.addWallet(wallet);
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Added wallet')),
+                            const SnackBar(content: Text('Success!')),
                           );
                           Navigator.pop(context);
-                          print(wallet.toMap());
-                          dbHelper.insertWallet(wallet);
+                          // print(_transaction.toMap());
+                          dbHelper.insertTransaction(_transaction);
                         }
                       },
                       child: const Text('Submit'),

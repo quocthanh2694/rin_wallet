@@ -44,7 +44,7 @@ class DbHelper {
       Create table transactions(
         id text primary key, 
         walletId text,
-        amount double
+        amount double,
         walletTransactionTypeId text,
         categoryId string,
         description string,
@@ -65,10 +65,11 @@ class DbHelper {
     return list;
   }
 
-  Future<Wallet> getWalletById(String id) async {
+  Future<Wallet?> getWalletById(String id) async {
     Database db = await this.db;
     List<Map> result =
         await db.rawQuery("SELECT * from wallets WHERE id=?", [id]);
+    if (result == null) return null;
     return Wallet.fromObject(result[0]);
   }
 
@@ -78,9 +79,9 @@ class DbHelper {
     return result;
   }
 
-  Future<int> deleteWallet(int id) async {
+  Future<int> deleteWallet(String id) async {
     Database db = await this.db;
-    var result = await db.rawDelete("delete from wallets where id= $id");
+    var result = await db.rawDelete("delete from wallets where id=?", [id]);
     return result;
   }
 
@@ -98,10 +99,24 @@ class DbHelper {
         .rawQuery("SELECT * from transactions WHERE walletId=?", [walletId]);
 
     List<WalletTransaction> list = List.generate(result.length, (i) {
+      print(result[i]);
       return WalletTransaction.fromObject(result[i]);
     });
 
     return list;
+  }
+
+  deleteTransaction(String transactionId) async {
+    Database db = await this.db;
+    await db.rawQuery("Delete from transactions WHERE id=?", [transactionId]);
+
+    return true;
+  }
+
+  Future<int> insertTransaction(WalletTransaction transaction) async {
+    Database db = await this.db;
+    var result = await db.insert("transactions", transaction.toMap());
+    return result;
   }
   //#endregion
 

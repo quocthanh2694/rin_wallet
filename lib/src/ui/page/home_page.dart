@@ -104,16 +104,79 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (BuildContext context, int index) {
             final item = wallets[index];
 
-            return ListTile(
-                title: Padding(
-                  padding: EdgeInsets.all(1),
-                  child: WalletCard(wallet: item, onPressed: () => {}),
+            return Dismissible(
+              // Each Dismissible must contain a Key. Keys allow Flutter to
+              // uniquely identify widgets.
+              direction: DismissDirection.startToEnd,
+              key: Key(item.id),
+              // Provide a function that tells the app
+              // what to do after an item has been swiped away.
+              confirmDismiss: (DismissDirection direction) async {
+                return await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Confirm"),
+                      content: const Text(
+                          "Are you sure you wish to delete this item?"),
+                      actions: <Widget>[
+                        TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text("DELETE")),
+                        MaterialButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text("CANCEL"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              onDismissed: (direction) async {
+                // Remove the item from the data source.
+                setState(() {
+                  wallets.removeAt(index);
+                });
+
+                await dbHelper.deleteWallet(item.id);
+
+                // Then show a snackbar.
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Deleted successfull!')));
+              },
+              // Show a red background as the item is swiped away.
+              background: Container(
+                color: Colors.red,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                          child: Text(
+                        'Delete',
+                        style: Theme.of(context)
+                            .textTheme
+                            .apply(
+                                bodyColor:
+                                    Theme.of(context).dialogBackgroundColor)
+                            .headlineSmall,
+                      )),
+                    ),
+                  ],
                 ),
-                leading: const CircleAvatar(
-                  // Display the Flutter Logo image asset.
-                  foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-                ),
-                onTap: () {});
+              ),
+              child: ListTile(
+                  title: Padding(
+                    padding: EdgeInsets.all(1),
+                    child: WalletCard(wallet: item, onPressed: () => {}),
+                  ),
+                  leading: const CircleAvatar(
+                    // Display the Flutter Logo image asset.
+                    foregroundImage:
+                        AssetImage('assets/images/flutter_logo.png'),
+                  ),
+                  onTap: () {}),
+            );
           },
         ),
       ),
