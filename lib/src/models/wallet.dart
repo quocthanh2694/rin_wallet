@@ -32,10 +32,10 @@ class Wallet {
     map["dateTime"] = dateTime.toString();
     map["currencyUnit"] = currencyUnit.toString();
     map["description"] = description;
-    map["initialAmount"] = initialAmount;
-    map["totalDeposit"] = totalDeposit;
-    map["totalWithdraw"] = totalWithdraw;
-    map["balance"] = balance;
+    map["initialAmount"] = initialAmount ?? 0;
+    map["totalDeposit"] = totalDeposit ?? 0;
+    map["totalWithdraw"] = totalWithdraw ?? 0;
+    map["balance"] = balance ?? 0;
     if (id != null) {
       map["id"] = id;
     }

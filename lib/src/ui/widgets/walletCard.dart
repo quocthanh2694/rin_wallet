@@ -28,7 +28,7 @@ class WalletCard extends StatelessWidget {
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
-                  "${this.wallet.name}",
+                  "${this.wallet.name} - ${wallet.balance}",
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
 

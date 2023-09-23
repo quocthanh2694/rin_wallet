@@ -56,13 +56,22 @@ class DbHelper {
 
   Future<List<Wallet>> getWallets() async {
     Database db = await this.db;
-    var result = await db.query("wallets");
+    var result = await db.rawQuery("SELECT * from wallets ORDER BY name");
+
     List<Wallet> list = List.generate(result.length, (i) {
       // dynamic item = result[i];
       // return new Wallet(item);
       return Wallet.fromObject(result[i]);
     });
     return list;
+  }
+
+  updateWalletAmount(String id, double amount) async {
+    // print(id +  '::::==='+ amount.toString());
+    Database db = await this.db;
+    List<Map<String, Object?>> res = await db.rawQuery(
+        "UPDATE wallets SET balance = balance + ? WHERE id=?", [amount, id]);
+    return res;
   }
 
   Future<Wallet?> getWalletById(String id) async {
@@ -95,8 +104,9 @@ class DbHelper {
   //#region Transactions
   Future<List<WalletTransaction>> getTransactions(String walletId) async {
     Database db = await this.db;
-    List<Map> result = await db
-        .rawQuery("SELECT * from transactions WHERE walletId=?", [walletId]);
+    List<Map> result = await db.rawQuery(
+        "SELECT * from transactions WHERE walletId=? ORDER BY dateTime DESC",
+        [walletId]);
 
     List<WalletTransaction> list = List.generate(result.length, (i) {
       print(result[i]);
@@ -106,17 +116,19 @@ class DbHelper {
     return list;
   }
 
+  Future<int> insertTransaction(WalletTransaction transaction) async {
+    Database db = await this.db;
+    var result = await db.insert("transactions", transaction.toMap());
+    // TODO: validate + or -
+    await updateWalletAmount(transaction.walletId, transaction.amount);
+    return result;
+  }
+
   deleteTransaction(String transactionId) async {
     Database db = await this.db;
     await db.rawQuery("Delete from transactions WHERE id=?", [transactionId]);
 
     return true;
-  }
-
-  Future<int> insertTransaction(WalletTransaction transaction) async {
-    Database db = await this.db;
-    var result = await db.insert("transactions", transaction.toMap());
-    return result;
   }
   //#endregion
 

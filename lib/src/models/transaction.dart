@@ -24,7 +24,7 @@ class WalletTransaction {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     map["walletId"] = walletId;
-    map["amount"] = amount;
+    map["amount"] = amount ?? 0;
     map["walletTransactionTypeId"] = walletTransactionTypeId;
     map["categoryId"] = categoryId;
     map["description"] = description;
@@ -43,7 +43,7 @@ class WalletTransaction {
     amount = o["amount"];
     walletTransactionTypeId = o["walletTransactionTypeId"];
     categoryId = o["categoryId"];
-    description = o["description"];
+    description = o["description"].toString();
     dateTime = DateTime.parse(o["dateTime"]);
     imgUrl = List.generate(o["imgUrl"].length, (i) {
       print(o["imgUrl"][i]);
