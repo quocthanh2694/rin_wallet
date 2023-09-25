@@ -1,29 +1,27 @@
 class TransactionCategory {
-  late TransactionCategory _walletType;
+  late String id;
+  late String name;
 
-  get walletType async {
-    if (_walletType == null) {
-      _walletType = await initialize();
+  TransactionCategory({
+    required String id,
+    required String name,
+  }) {
+    this.id = id;
+    this.name = name;
+  }
+
+  Map<String, dynamic> toMap() {
+    var map = Map<String, dynamic>();
+    map["name"] = name;
+    if (id != null) {
+      map["id"] = id;
     }
-    return _walletType as dynamic;
+
+    return map;
   }
 
-  initialize() async {
-    return TransactionCategory();
+  TransactionCategory.fromObject(dynamic o) {
+    id = o["id"];
+    name = o["name"].toString();
   }
-
-  List<TransactionCategoryModel> getList() {
-    List<TransactionCategoryModel> list = [
-      TransactionCategoryModel(id: 'category1', name: 'Category 1'),
-      TransactionCategoryModel(id: 'category2', name: 'Category 2'),
-    ];
-    return list;
-  }
-}
-
-class TransactionCategoryModel {
-  String id = '';
-  String name = '';
-
-  TransactionCategoryModel({required String this.id, required String this.name}) {}
 }

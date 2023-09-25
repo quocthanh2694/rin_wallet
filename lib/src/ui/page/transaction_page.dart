@@ -63,7 +63,12 @@ class _TransactionPageState extends State<TransactionPage> {
           builder: (context) => AddTransactionPage(
                 walletId: widget.walletId,
               )),
-    );
+    ).then((value) {
+      if (value == true) {
+        getWalletById();
+        getTransactions();
+      }
+    });
   }
 
   @override
@@ -95,7 +100,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   itemCount: transactions.length,
                   itemBuilder: (BuildContext context, int index) {
                     final item = transactions[index];
-          
+
                     return Dismissible(
                       // Each Dismissible must contain a Key. Keys allow Flutter to
                       // uniquely identify widgets.
@@ -131,9 +136,9 @@ class _TransactionPageState extends State<TransactionPage> {
                         setState(() {
                           transactions.removeAt(index);
                         });
-          
+
                         await dbHelper.deleteTransaction(item.id);
-          
+
                         // Then show a snackbar.
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Deleted successfull!')));
@@ -169,8 +174,8 @@ class _TransactionPageState extends State<TransactionPage> {
                               ),
                               leading: const CircleAvatar(
                                 // Display the Flutter Logo image asset.
-                                foregroundImage:
-                                    AssetImage('assets/images/flutter_logo.png'),
+                                foregroundImage: AssetImage(
+                                    'assets/images/flutter_logo.png'),
                               ),
                               onTap: () {}),
                         ],

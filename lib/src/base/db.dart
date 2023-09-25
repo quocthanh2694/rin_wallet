@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
+import 'package:rin_wallet/src/models/transaction_category.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
 import 'package:sqflite/sqflite.dart';
@@ -46,10 +47,17 @@ class DbHelper {
         walletId text,
         amount double,
         walletTransactionTypeId text,
-        categoryId string,
-        description string,
+        categoryId text,
+        description text,
         dateTime text,
-        imgUrl string
+        imgUrl text
+      )
+      """);
+
+    await db.execute("""
+      Create table transaction_categories(
+        id text primary key, 
+        name text
       )
       """);
   }
@@ -128,6 +136,33 @@ class DbHelper {
     Database db = await this.db;
     await db.rawQuery("Delete from transactions WHERE id=?", [transactionId]);
 
+    return true;
+  }
+  //#endregion
+
+  //#region Transactions
+  Future<List<TransactionCategory>> getTransactionCategories() async {
+    Database db = await this.db;
+    List<Map> result =
+        await db.rawQuery("SELECT * from transaction_categories");
+
+    List<TransactionCategory> list = List.generate(result.length, (i) {
+      print(result[i]);
+      return TransactionCategory.fromObject(result[i]);
+    });
+
+    return list;
+  }
+
+  Future<int> insertTransactionCategory(TransactionCategory data) async {
+    Database db = await this.db;
+    var result = await db.insert("transaction_categories", data.toMap());
+    return result;
+  }
+
+  deleteTransactionCategory(String id) async {
+    Database db = await this.db;
+    await db.rawQuery("Delete from transaction_categories WHERE id=?", [id]);
     return true;
   }
   //#endregion
