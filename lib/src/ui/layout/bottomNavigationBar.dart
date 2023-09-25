@@ -3,6 +3,7 @@ import 'package:rin_wallet/src/sample_feature/sample_item_list_view.dart';
 import 'package:rin_wallet/src/ui/page/home_page.dart';
 import 'package:rin_wallet/src/ui/page/settingsPage.dart';
 import 'package:rin_wallet/src/ui/page/login.dart';
+import 'package:rin_wallet/src/ui/page/user_note_page.dart';
 
 class BottomNavigationBarMain extends StatefulWidget {
   const BottomNavigationBarMain({super.key});
@@ -21,6 +22,7 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
     SampleItemListView(),
     SettingPage(),
     LoginPage(),
+    UserNotePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -56,6 +58,10 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Account',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.note),
+            label: 'Note',
           ),
         ],
         currentIndex: _selectedIndex,
