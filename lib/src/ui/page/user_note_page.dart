@@ -98,7 +98,7 @@ class _UserNotePageState extends State<UserNotePage> {
                   userNotes.removeAt(index);
                 });
                 if (item != null) {
-                  await dbHelper.deleteTransactionCategory(item.id!);
+                  await dbHelper.deleteUserNote(item.id!);
                 }
 
                 // Then show a snackbar.

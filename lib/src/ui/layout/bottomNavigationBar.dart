@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rin_wallet/src/sample_feature/sample_item_list_view.dart';
+import 'package:rin_wallet/src/ui/page/dashboard/dashboard_page.dart';
 import 'package:rin_wallet/src/ui/page/home_page.dart';
 import 'package:rin_wallet/src/ui/page/settingsPage.dart';
 import 'package:rin_wallet/src/ui/page/login.dart';
@@ -17,9 +18,10 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  static  List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    SampleItemListView(),
+    // SampleItemListView(),
+    DashboardPage(),
     SettingPage(),
     LoginPage(),
     UserNotePage(),
@@ -48,8 +50,8 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
+            icon: Icon(Icons.bar_chart),
+            label: 'Dashboard',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
