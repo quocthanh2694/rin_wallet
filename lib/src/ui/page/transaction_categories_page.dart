@@ -1,102 +1,63 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:rin_wallet/src/base/db.dart';
-import 'package:rin_wallet/src/models/cart.dart';
-import 'package:rin_wallet/src/models/catalog.dart';
-import 'package:rin_wallet/src/models/wallet.dart';
+import 'package:rin_wallet/src/models/transaction_category.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
-import 'package:rin_wallet/src/ui/page/add_wallet_page.dart';
-import 'package:rin_wallet/src/ui/page/walletDetailPage.dart';
-import 'package:rin_wallet/src/ui/widgets/walletCard.dart';
+import 'package:rin_wallet/src/ui/page/add_transaction_category_page.dart';
 
-class Test {
-  int id = 0;
-  String name = 'Hello';
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-      };
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({
+class TransactionCategoryPage extends StatefulWidget {
+  const TransactionCategoryPage({
     super.key,
   });
 
-  getItems() {
-    var jsonData = new Test();
-
-    return jsonData;
-  }
-
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<TransactionCategoryPage> createState() =>
+      _TransactionCategoryPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _TransactionCategoryPageState extends State<TransactionCategoryPage> {
   // int _counter = 0;
-  File? imageFile;
-  final List<String> items = List.generate(20, (index) => '${index}');
   var dbHelper = new DbHelper();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  late List<Wallet> wallets = [];
+  late List<TransactionCategory> categories = [];
   int walletCount = 0;
 
-  getWallets() async {
-    List<Wallet> data = await dbHelper.getWallets();
+  getList() async {
+    List<TransactionCategory> data = await dbHelper.getTransactionCategories();
     setState(() {
-      this.wallets = data;
+      this.categories = data;
       walletCount = data.length;
     });
+    print('@@@@@data');
+    print(data);
   }
 
   @override
   void initState() {
     // super.initState();
-    getWallets();
+    getList();
   }
 
-  void _createWallet() {
-    // setState(() {
-    //   _counter++;
-    // });
+  void _create() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddWalletPage()),
-    ).then((value) {
-      if (value == true) {
-        getWallets();
-      }
-    });
-  }
-
-  void _addToCart() {
-    var cart = context.read<CartModel>();
-    cart.add(new Item(1, 'Abc'));
-  }
-
-  void _navigateToSetting() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const WalletDetailPage()),
+      MaterialPageRoute(
+          builder: (context) => const AddTransactionCategoryPage()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const BaseAppBar(title: 'Home'),
+      appBar: const BaseAppBar(title: 'Transaction Categories'),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         // color: Colors.white,
         // backgroundColor: Colors.blue,
         strokeWidth: 4.0,
         onRefresh: () async {
-          await getWallets();
+          await getList();
           // return Future<void>.delayed(const Duration(seconds: 3));
         },
         child: ListView.builder(
@@ -104,15 +65,15 @@ class _HomePageState extends State<HomePage> {
           // scroll position when a user leaves and returns to the app after it
           // has been killed while running in the background.
           restorationId: 'homePageList',
-          itemCount: wallets.length,
+          itemCount: categories.length,
           itemBuilder: (BuildContext context, int index) {
-            final item = wallets[index];
+            final item = categories[index];
 
             return Dismissible(
               // Each Dismissible must contain a Key. Keys allow Flutter to
               // uniquely identify widgets.
               direction: DismissDirection.startToEnd,
-              key: Key(item.id),
+              key: Key(item.id!),
               // Provide a function that tells the app
               // what to do after an item has been swiped away.
               confirmDismiss: (DismissDirection direction) async {
@@ -139,10 +100,11 @@ class _HomePageState extends State<HomePage> {
               onDismissed: (direction) async {
                 // Remove the item from the data source.
                 setState(() {
-                  wallets.removeAt(index);
+                  categories.removeAt(index);
                 });
-
-                await dbHelper.deleteWallet(item.id);
+                if (item != null) {
+                  await dbHelper.deleteTransactionCategory(item.id!);
+                }
 
                 // Then show a snackbar.
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -172,12 +134,7 @@ class _HomePageState extends State<HomePage> {
               child: ListTile(
                   title: Padding(
                     padding: EdgeInsets.all(1),
-                    child: WalletCard(wallet: item, onPressed: () => {}),
-                  ),
-                  leading: const CircleAvatar(
-                    // Display the Flutter Logo image asset.
-                    foregroundImage:
-                        AssetImage('assets/images/flutter_logo.png'),
+                    child: Text(item.name!),
                   ),
                   onTap: () {}),
             );
@@ -185,7 +142,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _createWallet,
+        onPressed: _create,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
         shape: const RoundedRectangleBorder(

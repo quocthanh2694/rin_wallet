@@ -9,6 +9,8 @@ import 'package:rin_wallet/src/models/currency_unit.dart';
 import 'package:rin_wallet/src/models/transaction_type.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/models/wallet_type.dart';
+import 'package:rin_wallet/src/ui/page/add_transaction_category_page.dart';
+import 'package:rin_wallet/src/ui/page/transaction_categories_page.dart';
 import 'package:rin_wallet/src/utils/number.utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -30,14 +32,14 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
   // and allows validation of the form.
 
   final transactionType = TransactionType();
-  final transactionCategory = TransactionCategory();
+  // final transactionCategory = TransactionCategory();
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   late TextEditingController transactionTypeController;
-  late TextEditingController transactionCategoryController;
+  TextEditingController transactionCategoryController = TextEditingController();
   late TextEditingController walletController = TextEditingController();
   final descriptionController = TextEditingController();
   final initialAmountController = TextEditingController(text: '0');
@@ -47,6 +49,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
   var dbHelper = new DbHelper();
 
   late List<Wallet> wallets = [];
+  late List<TransactionCategory> transactionCategories = [];
 
   getWallets() async {
     List<Wallet> data = await dbHelper.getWallets();
@@ -56,17 +59,65 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
     walletController = TextEditingController(text: widget.walletId ?? '');
   }
 
+  getTransactionCategories() async {
+    List<TransactionCategory> data = await dbHelper.getTransactionCategories();
+    print('@@@@@@@');
+    print(data);
+    setState(() {
+      transactionCategories = data ?? [];
+    });
+    transactionCategoryController =
+        TextEditingController(text: data.isNotEmpty ? data[0].id : '');
+  }
+
+  _onAddTransactionCategory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddTransactionCategoryPage()),
+    ).then((value) {
+      if (value == true) {
+        getTransactionCategories();
+      }
+    });
+  }
+
   @override
   void initState() {
     getWallets();
+    getTransactionCategories();
 
     transactionTypeController =
         TextEditingController(text: transactionType.getList()[0].id);
 
-    transactionCategoryController =
-        TextEditingController(text: transactionCategory.getList()[0].id);
-
     super.initState();
+  }
+
+  _onSubmit() async{
+    // Validate returns true if the form is valid, or false otherwise.
+    if (_formKey.currentState!.validate()) {
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+
+      // print(_formKey);
+      WalletTransaction _transaction = WalletTransaction(
+        id: (new Uuid()).v1(),
+        description: descriptionController.text,
+        amount: double.parse(initialAmountController.text.replaceAll(',', '')),
+        walletId: walletController.text,
+        walletTransactionTypeId: transactionTypeController.text,
+        categoryId: transactionCategoryController.text,
+        dateTime: DateTime.parse(dateTimeController.text),
+      );
+
+      // appStore.addWallet(wallet);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Success!')),
+      );
+      // print(_transaction.toMap());
+      await dbHelper.insertTransaction(_transaction);
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -141,10 +192,10 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                 ),
                 DropdownButtonFormField(
                   value: transactionCategoryController.text,
-                  items: transactionCategory.getList().map((item) {
+                  items: transactionCategories.map((item) {
                     return DropdownMenuItem<String>(
                       value: item.id,
-                      child: Text(item.name),
+                      child: Text(item.name!),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -159,6 +210,13 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
                     labelText: 'Category Type',
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: _onAddTransactionCategory,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [Icon(Icons.add), Text('Add new Category')],
                   ),
                 ),
                 TextFormField(
@@ -199,35 +257,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                     constraints:
                         const BoxConstraints(minWidth: double.infinity),
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Validate returns true if the form is valid, or false otherwise.
-                        if (_formKey.currentState!.validate()) {
-                          // If the form is valid, display a snackbar. In the real world,
-                          // you'd often call a server or save the information in a database.
-
-                          // print(_formKey);
-                          WalletTransaction _transaction = WalletTransaction(
-                            id: (new Uuid()).v1(),
-                            description: descriptionController.text,
-                            amount: double.parse(initialAmountController.text
-                                .replaceAll(',', '')),
-                            walletId: walletController.text,
-                            walletTransactionTypeId:
-                                transactionTypeController.text,
-                            categoryId: transactionCategoryController.text,
-                            dateTime: DateTime.parse(dateTimeController.text),
-                          );
-
-                          // appStore.addWallet(wallet);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Success!')),
-                          );
-                          Navigator.pop(context);
-                          // print(_transaction.toMap());
-                          dbHelper.insertTransaction(_transaction);
-                        }
-                      },
+                      onPressed: _onSubmit,
                       child: const Text('Submit'),
                     ),
                   ),

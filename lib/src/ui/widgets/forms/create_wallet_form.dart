@@ -49,6 +49,41 @@ class CreateWalletFormState extends State<CreateWalletForm> {
     super.initState();
   }
 
+  _onSubmit() async {
+    // Validate returns true if the form is valid, or false otherwise.
+    if (_formKey.currentState!.validate()) {
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+
+      // print(_formKey);
+      print(walletTypeController.text);
+      // print(currencyUnitController.text);
+      // print(descriptionController.text);
+      // print(initialAmountController.text);
+      // print(dateTimeController.text);
+      // print(nameController.text);
+      // var appStore = context.read<AppStoreModel>();
+      Wallet wallet = Wallet(
+        id: (new Uuid()).v1(),
+        name: nameController.text,
+        walletTypeId: (new Uuid()).v1(),
+        dateTime: DateTime.parse(dateTimeController.text),
+        currencyUnit: currencyUnitController.text,
+        description: descriptionController.text,
+        initialAmount:
+            double.parse(initialAmountController.text.replaceAll(',', '')),
+      );
+
+      // appStore.addWallet(wallet);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Added wallet')),
+      );
+      await dbHelper.insertWallet(wallet);
+      Navigator.pop(context, true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -193,42 +228,7 @@ class CreateWalletFormState extends State<CreateWalletForm> {
                     constraints:
                         const BoxConstraints(minWidth: double.infinity),
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Validate returns true if the form is valid, or false otherwise.
-                        if (_formKey.currentState!.validate()) {
-                          // If the form is valid, display a snackbar. In the real world,
-                          // you'd often call a server or save the information in a database.
-
-                          // print(_formKey);
-                          print(walletTypeController.text);
-                          // print(currencyUnitController.text);
-                          // print(descriptionController.text);
-                          // print(initialAmountController.text);
-                          // print(dateTimeController.text);
-                          // print(nameController.text);
-                          // var appStore = context.read<AppStoreModel>();
-                          Wallet wallet = Wallet(
-                            id: (new Uuid()).v1(),
-                            name: nameController.text,
-                            walletTypeId: (new Uuid()).v1(),
-                            dateTime: DateTime.parse(dateTimeController.text),
-                            currencyUnit: currencyUnitController.text,
-                            description: descriptionController.text,
-                            initialAmount: double.parse(initialAmountController
-                                .text
-                                .replaceAll(',', '')),
-                          );
-
-                          // appStore.addWallet(wallet);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Added wallet')),
-                          );
-                          Navigator.pop(context);
-                          print(wallet.toMap());
-                          dbHelper.insertWallet(wallet);
-                        }
-                      },
+                      onPressed: _onSubmit,
                       child: const Text('Submit'),
                     ),
                   ),
