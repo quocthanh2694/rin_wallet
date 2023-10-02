@@ -106,7 +106,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
         walletId: walletController.text,
         walletTransactionTypeId: transactionTypeController.text,
         categoryId: transactionCategoryController.text,
-        dateTime: DateTime.parse(dateTimeController.text),
+        dateTime: DateTime.parse(dateTimeController.text).millisecondsSinceEpoch.toString(),
       );
 
       // appStore.addWallet(wallet);
@@ -116,7 +116,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
       );
       // print(_transaction.toMap());
       await dbHelper.insertTransaction(_transaction);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 

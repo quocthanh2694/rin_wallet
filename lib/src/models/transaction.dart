@@ -7,7 +7,7 @@ class WalletTransaction {
 
   // optional
   String? description = '';
-  DateTime? dateTime = DateTime.now();
+  String? dateTime = DateTime.now().toString();
   List<String>? imgUrl = [];
 
   WalletTransaction({
@@ -44,7 +44,7 @@ class WalletTransaction {
     walletTransactionTypeId = o["walletTransactionTypeId"];
     categoryId = o["categoryId"];
     description = o["description"].toString();
-    dateTime = DateTime.parse(o["dateTime"]);
+    dateTime = o["dateTime"];
     imgUrl = List.generate(o["imgUrl"].length, (i) {
       print(o["imgUrl"][i]);
       return o["imgUrl"][i];

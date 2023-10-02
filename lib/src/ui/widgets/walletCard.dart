@@ -28,13 +28,16 @@ class WalletCard extends StatelessWidget {
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
-                  "${this.wallet.name} - ${wallet.balance}",
+                  "${this.wallet.name}",
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
 
-                Text(
-                  "${formatNumber(trailingZero(wallet.balance ?? 0.0))}${this.wallet.currencyUnit == '\$' ? '\$' : ''}",
-                  style: Theme.of(context).textTheme.headlineSmall,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    "${formatNumber(trailingZero(wallet.balance ?? 0.0))}${this.wallet.currencyUnit == '\$' ? '\$' : ''}",
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
                 // Text(
                 //   this.wallet.currencyUnit,
@@ -56,7 +59,8 @@ class WalletCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    formatDateTime(this.wallet.dateTime),
+                    formatDateTime(DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(this.wallet.dateTime))),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],

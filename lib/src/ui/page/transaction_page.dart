@@ -85,6 +85,9 @@ class _TransactionPageState extends State<TransactionPage> {
               : Container(
                   height: 100,
                   child: WalletCard(wallet: wallet!, onPressed: () => {})),
+          Text(
+            'Transactions:',
+          ),
           Expanded(
             child: RefreshIndicator(
                 key: _refreshIndicatorKey,
@@ -172,11 +175,11 @@ class _TransactionPageState extends State<TransactionPage> {
                                 child: TransactionCard(
                                     transaction: item, onPressed: () => {}),
                               ),
-                              leading: const CircleAvatar(
-                                // Display the Flutter Logo image asset.
-                                foregroundImage: AssetImage(
-                                    'assets/images/flutter_logo.png'),
-                              ),
+                              // leading: const CircleAvatar(
+                              //   // Display the Flutter Logo image asset.
+                              //   foregroundImage: AssetImage(
+                              //       'assets/images/flutter_logo.png'),
+                              // ),
                               onTap: () {}),
                         ],
                       ),
@@ -190,6 +193,7 @@ class _TransactionPageState extends State<TransactionPage> {
         onPressed: _createTransaction,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
+        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topRight: Radius.circular(100),

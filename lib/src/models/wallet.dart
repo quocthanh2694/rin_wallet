@@ -3,7 +3,7 @@ class Wallet {
   late String id;
   late String name;
   late String walletTypeId;
-  late DateTime dateTime;
+  late String dateTime;
 
   // optional
   dynamic? currencyUnit;
@@ -47,7 +47,7 @@ class Wallet {
     this.id = o["id"];
     this.name = o["name"];
     this.walletTypeId = o["walletTypeId"];
-    this.dateTime = DateTime.parse(o["dateTime"]);
+    this.dateTime = o["dateTime"];
     this.currencyUnit = o["currencyUnit"];
     this.description = o["description"];
     this.initialAmount = o["initialAmount"];

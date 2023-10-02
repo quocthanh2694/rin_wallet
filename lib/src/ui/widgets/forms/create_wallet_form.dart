@@ -67,7 +67,7 @@ class CreateWalletFormState extends State<CreateWalletForm> {
         id: (new Uuid()).v1(),
         name: nameController.text,
         walletTypeId: (new Uuid()).v1(),
-        dateTime: DateTime.parse(dateTimeController.text),
+        dateTime: DateTime.parse(dateTimeController.text).millisecondsSinceEpoch.toString(),
         currencyUnit: currencyUnitController.text,
         description: descriptionController.text,
         initialAmount:

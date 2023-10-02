@@ -24,14 +24,14 @@ class TransactionCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radiusSm),
             color:
-                Theme.of(context).colorScheme.inversePrimary.withOpacity(0.5),
+                Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.3),
           ),
           child: Column(
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
                   "${this.transaction.description}",
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
 
                 Text(
@@ -58,7 +58,8 @@ class TransactionCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    formatDateTime(transaction.dateTime),
+                    formatDateTime(DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(transaction.dateTime ?? '0'))),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
