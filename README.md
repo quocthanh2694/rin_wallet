@@ -1,35 +1,8 @@
 # rin_wallet
 
-A new Flutter project.
+Welcome to Rin Wallet application - Flutter project
 
 ## Getting Started
 
-This project is a starting point for a Flutter application that follows the
-[simple app state management
-tutorial](https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple).
+Rin wallet application - manage your wallet & take note your accounts info - Written by Flutter support mobile (android/ios), web, and desktop app
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-## Assets
-
-The `assets` directory houses images, fonts, and any other files you want to
-include with your application.
-
-The `assets/images` directory contains [resolution-aware
-images](https://flutter.dev/docs/development/ui/assets-and-images#resolution-aware).
-
-## Localization
-
-This project generates localized messages based on arb files found in
-the `lib/src/localization` directory.
-
-To support additional languages, please visit the tutorial on
-[Internationalizing Flutter
-apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
-
-
-## TODO
-- Setup permission for ios: https://pub.dev/packages/permission_handler
-- setup folder picker: https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup#android

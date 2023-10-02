@@ -205,7 +205,7 @@ class DbHelper {
   //#region Backup & Restore
   Future<void> backupDB(String destinationPath) async {
     String dbPath = join(await getDatabasesPath(), "rin_wallet_db.db");
-    var file = File(dbPath);
+    var file = await File(dbPath);
     String today = DateFormat('yyyy_MM_dd').format(DateTime.now());
     await file.copy(destinationPath + "/${today}_${"rin_wallet_db.db"}");
     print('..Copied!!!!');

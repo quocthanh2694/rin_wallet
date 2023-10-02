@@ -43,10 +43,16 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Rin Wallet would like to save photos from the app to your gallery</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Upload images for </string>profile
+	<string>Upload images for profile</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Upload image from camera for profile</string>
 	<key>NSMicrophoneUsageDescription</key>

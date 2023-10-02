@@ -327,7 +327,7 @@ class _SettingPageState extends State<SettingPage> {
       source: ImageSource.camera,
       maxWidth: 1800,
       maxHeight: 1800,
-    )) as XFile;
+    ));
     if (pickedFile != null) {
       CroppedFile? croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
