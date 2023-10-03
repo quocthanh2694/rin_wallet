@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 // }
 
 class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const BaseAppBar({super.key, @required this.title});
+  const BaseAppBar({super.key, @required this.title, this.bgColor});
 
   final String? title;
+  final Color? bgColor;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -20,7 +21,9 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         '${this.title}',
       ),
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      backgroundColor: bgColor != null
+          ? bgColor
+          : Theme.of(context).colorScheme.inversePrimary,
     );
   }
 }

@@ -140,11 +140,14 @@ class _TransactionPageState extends State<TransactionPage> {
                           transactions.removeAt(index);
                         });
 
-                        await dbHelper.deleteTransaction(item.id);
+                        await dbHelper.deleteTransaction(item.id, item);
 
                         // Then show a snackbar.
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Deleted successfull!')));
+
+                        // get wallet for update amount
+                        getWalletById();
                       },
                       // Show a red background as the item is swiped away.
                       background: Container(

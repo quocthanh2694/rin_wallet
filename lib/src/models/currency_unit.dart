@@ -12,7 +12,7 @@ class CurrencyUnit {
   List<CurrencyUnitModel> getList() {
     List<CurrencyUnitModel> list = [
       CurrencyUnitModel(id: 'vnd', name: 'VND'),
-      CurrencyUnitModel(id: 'dollar', name: "\$"),
+      // CurrencyUnitModel(id: 'dollar', name: "\$"),
     ];
     return list;
   }

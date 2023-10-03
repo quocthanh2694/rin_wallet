@@ -20,6 +20,18 @@ class TransactionType {
     ];
     return list;
   }
+
+  isDeposit(String id) {
+    return id == 'deposit';
+  }
+
+  isWithdraw(String id) {
+    return id == 'withdraw';
+  }
+
+  isTransfer(String id) {
+    return id == 'transfer';
+  }
 }
 
 class TransactionTypeModel {

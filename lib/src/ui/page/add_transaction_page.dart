@@ -10,7 +10,9 @@ class AddTransactionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BaseAppBar(title: 'Add Transaction'),
+      appBar: BaseAppBar(
+          title: 'Add Transaction',
+          bgColor: Theme.of(context).colorScheme.tertiaryContainer),
       body: Center(
         child: CreateTransactionForm(
           walletId: walletId,

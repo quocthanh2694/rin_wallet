@@ -4,10 +4,8 @@ const locale = 'en';
 String formatNumber(String s) {
   try {
     final String res = NumberFormat.decimalPattern(locale).format(int.parse(s));
-    print(res);
     return res;
   } catch (e) {
-    print(e);
     return s;
   }
 }

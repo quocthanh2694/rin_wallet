@@ -92,7 +92,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
     super.initState();
   }
 
-  _onSubmit() async{
+  _onSubmit() async {
     // Validate returns true if the form is valid, or false otherwise.
     if (_formKey.currentState!.validate()) {
       // If the form is valid, display a snackbar. In the real world,
@@ -106,7 +106,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
         walletId: walletController.text,
         walletTransactionTypeId: transactionTypeController.text,
         categoryId: transactionCategoryController.text,
-        dateTime: DateTime.parse(dateTimeController.text).millisecondsSinceEpoch.toString(),
+        dateTime: dateTimeController.text.toString(),
       );
 
       // appStore.addWallet(wallet);

@@ -59,8 +59,7 @@ class WalletCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    formatDateTime(DateTime.fromMillisecondsSinceEpoch(
-                        int.parse(this.wallet.dateTime))),
+                    formatDateTimeFromString(this.wallet.dateTime),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],

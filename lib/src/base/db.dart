@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
+import 'package:rin_wallet/src/models/dashboards/transactionByMonth.dart';
 import 'package:rin_wallet/src/models/transaction_category.dart';
+import 'package:rin_wallet/src/models/transaction_type.dart';
 import 'package:rin_wallet/src/models/user_note.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
@@ -32,7 +35,7 @@ class DbHelper {
         id text primary key, 
         name text,
         walletTypeId text,
-        dateTime text,
+        dateTime TIMESTAMP,
         currencyUnit text,
         description text,
         initialAmount double,
@@ -50,7 +53,7 @@ class DbHelper {
         walletTransactionTypeId text,
         categoryId text,
         description text,
-        dateTime text,
+        dateTime TIMESTAMP,
         imgUrl text
       )
       """);
@@ -136,14 +139,31 @@ class DbHelper {
   Future<int> insertTransaction(WalletTransaction transaction) async {
     Database db = await this.db;
     var result = await db.insert("transactions", transaction.toMap());
-    // TODO: validate + or -
-    await updateWalletAmount(transaction.walletId, transaction.amount);
+    // + or - wallet amount
+    var transactionType = new TransactionType();
+    double newAmount = 1;
+    if (transactionType.isWithdraw(transaction.walletTransactionTypeId) ||
+        transactionType.isTransfer(transaction.walletTransactionTypeId)) {
+      newAmount = -1;
+    }
+    await updateWalletAmount(
+        transaction.walletId, transaction.amount * newAmount);
     return result;
   }
 
-  deleteTransaction(String transactionId) async {
+  deleteTransaction(String transactionId, WalletTransaction transaction) async {
     Database db = await this.db;
     await db.rawQuery("Delete from transactions WHERE id=?", [transactionId]);
+
+    // + or - wallet amount
+    var transactionType = new TransactionType();
+    double newAmount = -1;
+    if (transactionType.isWithdraw(transaction.walletTransactionTypeId) ||
+        transactionType.isTransfer(transaction.walletTransactionTypeId)) {
+      newAmount = 1;
+    }
+    await updateWalletAmount(
+        transaction.walletId, transaction.amount * newAmount);
 
     return true;
   }
@@ -199,6 +219,29 @@ class DbHelper {
     Database db = await this.db;
     await db.rawQuery("Delete from transaction_categories WHERE id=?", [id]);
     return true;
+  }
+  //#endregion
+
+  //#region Dashboard
+  Future<List<TransactionByMonth>> getTransactionTotalAmountByMonth() async {
+    Database db = await this.db;
+    List<Map> result = await db.rawQuery("""
+
+SELECT walletTransactionTypeId,
+  STRFTIME("%m/%Y", dateTime) AS month, 
+  sum(amount) AS total
+FROM transactions
+GROUP BY walletTransactionTypeId, STRFTIME("%m/%Y", dateTime)
+ORDER BY dateTime
+
+""");
+
+    List<TransactionByMonth> list = List.generate(result.length, (i) {
+      // print(result[i]);
+      return TransactionByMonth.fromObject(result[i]);
+    });
+
+    return list;
   }
   //#endregion
 

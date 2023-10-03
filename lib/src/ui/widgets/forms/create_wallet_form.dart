@@ -56,18 +56,12 @@ class CreateWalletFormState extends State<CreateWalletForm> {
       // you'd often call a server or save the information in a database.
 
       // print(_formKey);
-      print(walletTypeController.text);
-      // print(currencyUnitController.text);
-      // print(descriptionController.text);
-      // print(initialAmountController.text);
-      // print(dateTimeController.text);
-      // print(nameController.text);
       // var appStore = context.read<AppStoreModel>();
       Wallet wallet = Wallet(
         id: (new Uuid()).v1(),
         name: nameController.text,
         walletTypeId: (new Uuid()).v1(),
-        dateTime: DateTime.parse(dateTimeController.text).millisecondsSinceEpoch.toString(),
+        dateTime: dateTimeController.text.toString(),
         currencyUnit: currencyUnitController.text,
         description: descriptionController.text,
         initialAmount:
