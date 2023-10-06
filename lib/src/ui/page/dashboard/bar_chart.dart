@@ -9,8 +9,8 @@ import 'package:rin_wallet/src/utils/number.utils.dart';
 class BarChartSample extends StatefulWidget {
   List<BarChartModel> rawData;
   String title = '';
-  final Color leftBarColor = Colors.purple;
-  final Color rightBarColor = Colors.blueGrey;
+  final Color leftBarColor = Colors.green;
+  final Color rightBarColor = Colors.red;
   final Color avgColor = Colors.orange;
 
   BarChartSample(
@@ -107,25 +107,18 @@ class BarChartSampleState extends State<BarChartSample> {
                       // }
                       String txt = formatNumber(trailingZero(rod.toY));
                       return BarTooltipItem(
-                          txt,
-                          const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ));
-                      return BarTooltipItem(
                         '$weekDay\n',
                         const TextStyle(
-                          color: Colors.black,
+                          color: Colors.black87,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 14,
                         ),
                         children: <TextSpan>[
                           TextSpan(
                             text: txt,
                             style: TextStyle(
-                              color: Colors.deepPurpleAccent[200],
-                              fontSize: 16,
+                              color: rod.color,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -177,8 +170,6 @@ class BarChartSampleState extends State<BarChartSample> {
                   // },
 
                   touchCallback: (FlTouchEvent event, barTouchResponse) {
-                    print('touched callback');
-                    print(event);
                     // setState(() {
                     if (!event.isInterestedForInteractions ||
                         barTouchResponse == null ||
@@ -186,9 +177,6 @@ class BarChartSampleState extends State<BarChartSample> {
                       // touchedIndex = -1;
                       return;
                     }
-                    print(inspect(barTouchResponse));
-                    print(barTouchResponse.spot!.touchedBarGroupIndex);
-
                     // touchedIndex =
                     //     barTouchResponse.spot!.touchedBarGroupIndex;
                     // });
@@ -257,7 +245,7 @@ class BarChartSampleState extends State<BarChartSample> {
     const style = TextStyle(
       color: Color(0xff7589a2),
       fontWeight: FontWeight.bold,
-      fontSize: 14,
+      fontSize: 12,
     );
 
     String num = NumberFormat.compactCurrency(

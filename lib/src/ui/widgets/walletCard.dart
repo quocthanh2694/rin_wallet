@@ -44,6 +44,14 @@ class WalletCard extends StatelessWidget {
                 //   style: Theme.of(context).textTheme.headlineSmall,
                 // ),
               ]),
+              Row(
+                children: [
+                  Text(
+                    "Init Amount: ${formatNumber(trailingZero(wallet.initialAmount ?? 0.0))}",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
               wallet.description!.isNotEmpty
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.start,

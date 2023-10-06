@@ -17,6 +17,7 @@ class CreateUserNoteForm extends StatefulWidget {
 
 class CreateUserNoteFormState extends State<CreateUserNoteForm> {
   final _formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
   final noteController = TextEditingController();
   final descriptionController = TextEditingController();
 
@@ -26,6 +27,7 @@ class CreateUserNoteFormState extends State<CreateUserNoteForm> {
     if (_formKey.currentState!.validate()) {
       UserNote _formData = UserNote(
         id: (new Uuid()).v1(),
+        title: titleController.text,
         note: noteController.text,
         description: descriptionController.text,
       );
@@ -50,11 +52,19 @@ class CreateUserNoteFormState extends State<CreateUserNoteForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextFormField(
+                  controller: titleController,
+                  keyboardType: TextInputType.multiline,
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Title',
+                  ),
+                ),
+                TextFormField(
                   controller: noteController,
                   keyboardType: TextInputType.multiline,
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
-                    labelText: 'Name',
+                    labelText: 'Note',
                   ),
                 ),
                 TextFormField(

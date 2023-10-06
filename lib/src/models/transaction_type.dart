@@ -16,7 +16,7 @@ class TransactionType {
     List<TransactionTypeModel> list = [
       TransactionTypeModel(id: 'deposit', name: 'Deposit'),
       TransactionTypeModel(id: 'withdraw', name: 'Withdraw'),
-      TransactionTypeModel(id: 'transfer', name: 'Transfer'),
+      // TransactionTypeModel(id: 'transfer', name: 'Transfer'),
     ];
     return list;
   }

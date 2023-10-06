@@ -68,6 +68,7 @@ class DbHelper {
     await db.execute("""
       Create table user_notes(
         id text primary key, 
+        title text,
         note text,
         description text
       )
@@ -223,17 +224,40 @@ class DbHelper {
   //#endregion
 
   //#region Dashboard
-  Future<List<TransactionByMonth>> getTransactionTotalAmountByMonth() async {
+  Future<List<TransactionByMonth>> getTransactionTotalAmountStatistic(
+      {String? type = 'month',
+      DateTime? fromDate,
+      DateTime? toDate,
+      String? walletId}) async {
+    String groupBy = '';
+    String where = '';
+    if (type == 'day') {
+      groupBy = 'STRFTIME("%d/%m/%Y", dateTime)';
+    } else {
+      groupBy = 'STRFTIME("%m/%Y", dateTime)';
+    }
+
+    if (fromDate != null && toDate != null) {
+      where = "WHERE dateTime > '${fromDate}' AND dateTime < '${toDate}'";
+    }
+
+    if (walletId != null && walletId!.length > 0) {
+      if (where != '') {
+        where += " AND walletId = '${walletId}'";
+      } else {
+        where = "WHERE walletId = '${walletId}'";
+      }
+    }
+
     Database db = await this.db;
     List<Map> result = await db.rawQuery("""
-
 SELECT walletTransactionTypeId,
-  STRFTIME("%m/%Y", dateTime) AS month, 
+  ${groupBy} AS month, 
   sum(amount) AS total
 FROM transactions
-GROUP BY walletTransactionTypeId, STRFTIME("%m/%Y", dateTime)
+${where}
+GROUP BY walletTransactionTypeId, ${groupBy}
 ORDER BY dateTime
-
 """);
 
     List<TransactionByMonth> list = List.generate(result.length, (i) {

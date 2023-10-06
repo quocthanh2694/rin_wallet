@@ -61,8 +61,6 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
 
   getTransactionCategories() async {
     List<TransactionCategory> data = await dbHelper.getTransactionCategories();
-    print('@@@@@@@');
-    print(data);
     setState(() {
       transactionCategories = data ?? [];
     });
@@ -145,7 +143,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                 AmountTextFormField(
                     initialAmountController: initialAmountController),
                 DropdownButtonFormField(
-                  value: walletController.text,
+                  value: walletController.text.isNotEmpty ?  walletController.text : null,
                   items: wallets.map((item) {
                     return DropdownMenuItem<String>(
                       value: item.id,
@@ -233,8 +231,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                       context,
                       showTitleActions: true,
                       currentTime: DateTime.parse(dateTimeController.text),
-                      minTime: DateTime(2018, 3, 5),
-                      maxTime: DateTime(2019, 6, 7),
+                      minTime: DateTime(2020, 1, 1),
                       locale: LocaleType.en,
                       onChanged: (date) {
                         print('change $date');

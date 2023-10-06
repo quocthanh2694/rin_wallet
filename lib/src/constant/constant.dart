@@ -7,3 +7,5 @@ const kPaddingXs = EdgeInsets.all(8);
 const radius = 16.0;
 const radiusSm = 12.0;
 const radiusXs = 8.0;
+
+String HIDDEN_TEXT = '***';

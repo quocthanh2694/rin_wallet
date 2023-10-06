@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rin_wallet/src/base/db.dart';
+import 'package:rin_wallet/src/constant/constant.dart';
 import 'package:rin_wallet/src/models/transaction_category.dart';
 import 'package:rin_wallet/src/models/user_note.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
@@ -22,6 +23,7 @@ class _UserNotePageState extends State<UserNotePage> {
 
   late List<UserNote> userNotes = [];
   int walletCount = 0;
+  bool hide = true;
 
   getList() async {
     List<UserNote> data = await dbHelper.getUserNotes();
@@ -51,7 +53,19 @@ class _UserNotePageState extends State<UserNotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const BaseAppBar(title: 'Notes'),
+      appBar: BaseAppBar(
+        title: 'Notes',
+        actions: [
+          IconButton(
+            icon: Icon(hide ? Icons.remove_red_eye_sharp : Icons.password),
+            onPressed: () {
+              setState(() {
+                this.hide = !this.hide;
+              });
+            },
+          )
+        ],
+      ),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         strokeWidth: 4.0,
@@ -133,14 +147,23 @@ class _UserNotePageState extends State<UserNotePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                          Text(
-                            item.note,
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          Text(item.description),
-                        ]),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                hide
+                                    ? "${item.title.substring(0, 4)}${HIDDEN_TEXT}${item.title.length > 10 ? item.title.substring(item.title.length - 5) : ''}"
+                                    : item.title,
+                                style:
+                                    Theme.of(context).textTheme.labelLarge,
+                              ),
+                              Text(
+                                hide ? HIDDEN_TEXT : item.note,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              Text(hide ? HIDDEN_TEXT : item.description,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ]),
                       ),
                     ),
                   ),

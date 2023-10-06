@@ -188,8 +188,7 @@ class CreateWalletFormState extends State<CreateWalletForm> {
                       context,
                       showTitleActions: true,
                       currentTime: DateTime.parse(dateTimeController.text),
-                      minTime: DateTime(2018, 3, 5),
-                      maxTime: DateTime(2019, 6, 7),
+                      minTime: DateTime(2020, 1, 1),
                       locale: LocaleType.en,
                       onChanged: (date) {
                         print('change $date');

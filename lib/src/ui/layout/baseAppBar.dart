@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 // }
 
 class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const BaseAppBar({super.key, @required this.title, this.bgColor});
+  const BaseAppBar(
+      {super.key, @required this.title, this.bgColor, this.actions});
 
   final String? title;
   final Color? bgColor;
+  final List<Widget>? actions;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -24,6 +26,7 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: bgColor != null
           ? bgColor
           : Theme.of(context).colorScheme.inversePrimary,
+      actions: actions != null ? actions : [],
     );
   }
 }
