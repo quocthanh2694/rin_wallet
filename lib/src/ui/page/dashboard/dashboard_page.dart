@@ -4,12 +4,14 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/charts/bar_chart.dart';
 import 'package:rin_wallet/src/models/charts/chart_type.dart';
+import 'package:rin_wallet/src/models/charts/pie_chart.dart';
+import 'package:rin_wallet/src/models/dashboards/total_withdraw_by_wallet.dart';
 import 'package:rin_wallet/src/models/dashboards/transactionByMonth.dart';
 import 'package:rin_wallet/src/models/transaction_type.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
 import 'package:rin_wallet/src/ui/page/dashboard/bar_chart.dart';
-import 'package:rin_wallet/src/ui/page/dashboard/pie_chart_budget.dart';
+import 'package:rin_wallet/src/ui/page/dashboard/pie_chart.dart';
 import 'package:rin_wallet/src/utils/datetime.util.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -24,6 +26,7 @@ class DashboardPageState extends State<DashboardPage> {
 
   final chartType = ChartType();
 
+  List<PieChartModel> pieChartData = [];
   List<BarChartModel> list = [];
   TransactionType transactionType = TransactionType();
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
@@ -34,7 +37,33 @@ class DashboardPageState extends State<DashboardPage> {
   var dbHelper = new DbHelper();
   late List<Wallet> wallets = [];
 
-  initData() async {
+  final fromDatePieChartController = TextEditingController();
+  final toDatePieChartController = TextEditingController();
+
+  initPieChart() async {
+    var res = await db.getTotalWithdrawByWallet(
+      fromDate: fromDatePieChartController.text.isNotEmpty
+          ? DateTime.parse(fromDatePieChartController.text)
+          : null,
+      toDate: toDatePieChartController.text.isNotEmpty
+          ? DateTime.parse(toDatePieChartController.text)
+          : null,
+    );
+    List<PieChartModel> list = [];
+    for (int j = 0; j < res.length; j++) {
+      TotalWithdrawByWallet element = res[j];
+      PieChartModel temp = PieChartModel(
+        name: element.walletName,
+        value: element.total,
+      );
+      list.add(temp);
+    }
+    setState(() {
+      pieChartData = list;
+    });
+  }
+
+  initBarChartData() async {
     List<BarChartModel> _list = [];
 
     var res = await db.getTransactionTotalAmountStatistic(
@@ -103,113 +132,177 @@ class DashboardPageState extends State<DashboardPage> {
     toDateController.clear();
     _key.currentState?.reset();
     walletController.clear();
-    initData();
+    initBarChartData();
   }
 
   @override
   void initState() {
     super.initState();
-    initData();
+    // bar chart
+    initBarChartData();
     getWallets();
+
+    // pie chart
+    initPieChart();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('@@@@@@@@@@@@@@@@@@@@@@@@');
+    print(pieChartData);
+
     return Scaffold(
       appBar: const BaseAppBar(title: 'Dashboard'),
       body: ListView(children: [
+        // bar chart
+        TotalDepositWithdrawChart(),
+
+        // pie chart
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField(
-                      key: _key,
-                      hint: Text('All wallet'),
-                      value: walletController.text.isNotEmpty
-                          ? walletController.text
-                          : null,
-                      items: wallets.map((item) {
-                        return DropdownMenuItem<String>(
-                          value: item.id,
-                          child: Text(item.name),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        walletController.text = val.toString();
-                        initData();
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Required';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'Wallet',
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: DropdownButtonFormField(
-                      hint: Text('Month'),
-                      value: chartTypeController.text.isNotEmpty
-                          ? chartTypeController.text
-                          : null,
-                      items: chartType.getList().map((item) {
-                        return DropdownMenuItem<String>(
-                          value: item.id,
-                          child: Text(item.name),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        chartTypeController.text = val.toString();
-                        initData();
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Required';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'Chart Type',
-                      ),
-                    ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Total withdraw amont by wallet',
+                    style: TextStyle(color: Colors.black, fontSize: 20),
                   ),
                 ],
               ),
               Row(
                 children: [
                   FromDateWidget(
-                      fromDateController: fromDateController,
-                      initData: initData),
+                      fromDateController: fromDatePieChartController,
+                      initData: initPieChart),
                   ToDateWidget(
-                      toDateController: toDateController, initData: initData),
+                      toDateController: toDatePieChartController,
+                      initData: initPieChart),
                 ],
               ),
-              Row(
-                children: [
-                  OutlinedButton(
-                    onPressed: _onClear,
-                    child: const Text('Clear'),
-                  ),
-                  // ElevatedButton(
-                  //   onPressed: _onSubmitFilter,
-                  //   child: const Text('Submit'),
-                  // ),
-                ],
-              ),
+              pieChartData.length > 0
+                  ? PieChartSample(
+                      rawData: pieChartData,
+                    )
+                  : Container(
+                      child: Text('Empty Data'),
+                    ),
             ],
           ),
         ),
-        BarChartSample(rawData: list, title: 'Transactions'),
-        PieChartBudget(),
       ]),
+    );
+  }
+
+  Container TotalDepositWithdrawChart() {
+    return Container(
+      child: Column(
+        children: [
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Transactions',
+                style: TextStyle(color: Colors.black, fontSize: 22),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField(
+                        key: _key,
+                        hint: Text('All wallet'),
+                        value: walletController.text.isNotEmpty
+                            ? walletController.text
+                            : null,
+                        items: wallets.map((item) {
+                          return DropdownMenuItem<String>(
+                            value: item.id,
+                            child: Text(item.name),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          walletController.text = val.toString();
+                          initBarChartData();
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Required';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Wallet',
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: DropdownButtonFormField(
+                        hint: Text('Month'),
+                        value: chartTypeController.text.isNotEmpty
+                            ? chartTypeController.text
+                            : null,
+                        items: chartType.getList().map((item) {
+                          return DropdownMenuItem<String>(
+                            value: item.id,
+                            child: Text(item.name),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          chartTypeController.text = val.toString();
+                          initBarChartData();
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Required';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Chart Type',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    FromDateWidget(
+                        fromDateController: fromDateController,
+                        initData: initBarChartData),
+                    ToDateWidget(
+                        toDateController: toDateController,
+                        initData: initBarChartData),
+                  ],
+                ),
+                Row(
+                  children: [
+                    OutlinedButton(
+                      onPressed: _onClear,
+                      child: const Text('Clear'),
+                    ),
+                    // ElevatedButton(
+                    //   onPressed: _onSubmitFilter,
+                    //   child: const Text('Submit'),
+                    // ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          BarChartSample(
+            rawData: list,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -240,9 +333,7 @@ class ToDateWidget extends StatelessWidget {
                 : DateTime.parse(toDateController.text),
             minTime: DateTime(2020, 1, 1),
             locale: LocaleType.en,
-            onChanged: (date) {
-              print('change $date');
-            },
+            onChanged: (date) {},
             onConfirm: (date) {
               toDateController.text = formatDate(date);
               initData();
@@ -285,9 +376,7 @@ class FromDateWidget extends StatelessWidget {
                 : DateTime.parse(fromDateController.text),
             minTime: DateTime(2020, 1, 1),
             locale: LocaleType.en,
-            onChanged: (date) {
-              print('change $date');
-            },
+            onChanged: (date) {},
             onConfirm: (date) {
               fromDateController.text = formatDate(date);
               initData();

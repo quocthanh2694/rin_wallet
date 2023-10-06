@@ -8,15 +8,14 @@ import 'package:rin_wallet/src/utils/number.utils.dart';
 
 class BarChartSample extends StatefulWidget {
   List<BarChartModel> rawData;
-  String title = '';
   final Color leftBarColor = Colors.green;
   final Color rightBarColor = Colors.red;
   final Color avgColor = Colors.orange;
 
-  BarChartSample(
-      {super.key,
-      required List<BarChartModel> this.rawData,
-      required this.title});
+  BarChartSample({
+    super.key,
+    required List<BarChartModel> this.rawData,
+  });
 
   @override
   State<StatefulWidget> createState() => BarChartSampleState();
@@ -42,7 +41,6 @@ class BarChartSampleState extends State<BarChartSample> {
       var element = widget.rawData[i];
       BarChartGroupData barGroup = makeGroupData(i, element.y1, element.y2);
       items.add(barGroup);
-      print(inspect(barGroup));
 
       List list = [max, element.y1, element.y2];
       double _max = list.reduce((curr, next) => curr > next ? curr : next);
@@ -58,17 +56,37 @@ class BarChartSampleState extends State<BarChartSample> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          const SizedBox(
+            height: 10,
+          ),
           Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                widget.title,
-                style: TextStyle(color: Colors.black, fontSize: 22),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.square,
+                    color: widget.leftBarColor,
+                  ),
+                  const Text('Deposit')
+                ],
               ),
+              const SizedBox(
+                width: 20,
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.square,
+                    color: widget.rightBarColor,
+                  ),
+                  Text('Withdraw')
+                ],
+              )
             ],
           ),
           const SizedBox(
-            height: 38,
+            height: 20,
           ),
           AspectRatio(
             aspectRatio: 1,

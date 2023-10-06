@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
+import 'package:rin_wallet/src/models/dashboards/total_withdraw_by_wallet.dart';
 import 'package:rin_wallet/src/models/dashboards/transactionByMonth.dart';
 import 'package:rin_wallet/src/models/transaction_category.dart';
 import 'package:rin_wallet/src/models/transaction_type.dart';
@@ -88,7 +89,6 @@ class DbHelper {
   }
 
   updateWalletAmount(String id, double amount) async {
-    // print(id +  '::::==='+ amount.toString());
     Database db = await this.db;
     List<Map<String, Object?>> res = await db.rawQuery(
         "UPDATE wallets SET balance = balance + ? WHERE id=?", [amount, id]);
@@ -130,7 +130,6 @@ class DbHelper {
         [walletId]);
 
     List<WalletTransaction> list = List.generate(result.length, (i) {
-      print(result[i]);
       return WalletTransaction.fromObject(result[i]);
     });
 
@@ -176,7 +175,6 @@ class DbHelper {
     List<Map> result = await db.rawQuery("SELECT * from user_notes");
 
     List<UserNote> list = List.generate(result.length, (i) {
-      print(result[i]);
       return UserNote.fromObject(result[i]);
     });
 
@@ -203,7 +201,6 @@ class DbHelper {
         await db.rawQuery("SELECT * from transaction_categories");
 
     List<TransactionCategory> list = List.generate(result.length, (i) {
-      print(result[i]);
       return TransactionCategory.fromObject(result[i]);
     });
 
@@ -223,7 +220,40 @@ class DbHelper {
   }
   //#endregion
 
-  //#region Dashboard
+  //#region Dashboard & statistic
+
+  Future<List<TotalWithdrawByWallet>> getTotalWithdrawByWallet({
+    DateTime? fromDate,
+    DateTime? toDate,
+  }) async {
+    String where = "WHERE walletTransactionTypeId='withdraw' ";
+
+    if (fromDate != null && toDate != null) {
+      where += " AND dateTime > '${fromDate}' AND dateTime < '${toDate}'";
+    }
+
+print(fromDate.toString() + toDate.toString());
+    Database db = await this.db;
+    List<Map> result = await db.rawQuery("""
+SELECT walletId, name as walletName, total
+FROM wallets join
+(
+  SELECT walletId, sum(amount) AS total
+  FROM transactions
+  ${where}
+  GROUP BY walletId
+  ORDER BY dateTime
+)
+WHERE walletId = id
+""");
+
+    List<TotalWithdrawByWallet> list = List.generate(result.length, (i) {
+      return TotalWithdrawByWallet.fromObject(result[i]);
+    });
+
+    return list;
+  }
+
   Future<List<TransactionByMonth>> getTransactionTotalAmountStatistic(
       {String? type = 'month',
       DateTime? fromDate,
@@ -261,7 +291,6 @@ ORDER BY dateTime
 """);
 
     List<TransactionByMonth> list = List.generate(result.length, (i) {
-      // print(result[i]);
       return TransactionByMonth.fromObject(result[i]);
     });
 

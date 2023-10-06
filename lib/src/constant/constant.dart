@@ -9,3 +9,26 @@ const radiusSm = 12.0;
 const radiusXs = 8.0;
 
 String HIDDEN_TEXT = '***';
+
+List<MaterialColor> COLORS = [
+  Colors.blue,
+  Colors.purple,
+  Colors.green,
+  Colors.red,
+  Colors.orange,
+  Colors.indigo,
+  // TODO: repeat
+  Colors.blue,
+  Colors.purple,
+  Colors.green,
+  Colors.red,
+  Colors.orange,
+  Colors.indigo,
+  // TODO: repeat
+  Colors.blue,
+  Colors.purple,
+  Colors.green,
+  Colors.red,
+  Colors.orange,
+  Colors.indigo,
+];
