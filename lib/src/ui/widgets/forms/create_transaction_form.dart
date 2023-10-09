@@ -1,7 +1,12 @@
 // Create a Form widget.
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
 import 'package:rin_wallet/src/models/transaction_category.dart';
@@ -13,6 +18,7 @@ import 'package:rin_wallet/src/ui/page/add_transaction_category_page.dart';
 import 'package:rin_wallet/src/ui/page/transaction_categories_page.dart';
 import 'package:rin_wallet/src/utils/number.utils.dart';
 import 'package:uuid/uuid.dart';
+import 'package:image/image.dart' as ImageProcess;
 
 class CreateTransactionForm extends StatefulWidget {
   const CreateTransactionForm({super.key, required this.walletId});
@@ -32,10 +38,8 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
   // and allows validation of the form.
 
   final transactionType = TransactionType();
-  // final transactionCategory = TransactionCategory();
-  //
-  // Note: This is a GlobalKey<FormState>,
-  // not a GlobalKey<MyCustomFormState>.
+
+  File? imageFile;
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   late TextEditingController transactionTypeController;
@@ -95,8 +99,14 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
     if (_formKey.currentState!.validate()) {
       // If the form is valid, display a snackbar. In the real world,
       // you'd often call a server or save the information in a database.
+      String? base64Image;
+      if (imageFile != null) {
+        final _imageFile = ImageProcess.decodeImage(
+          imageFile!.readAsBytesSync(),
+        );
+        base64Image = base64Encode(ImageProcess.encodePng(_imageFile!));
+      }
 
-      // print(_formKey);
       WalletTransaction _transaction = WalletTransaction(
         id: (new Uuid()).v1(),
         description: descriptionController.text,
@@ -105,6 +115,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
         walletTransactionTypeId: transactionTypeController.text,
         categoryId: transactionCategoryController.text,
         dateTime: dateTimeController.text.toString(),
+        base64Image: base64Image,
       );
 
       // appStore.addWallet(wallet);
@@ -115,6 +126,52 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
       // print(_transaction.toMap());
       await dbHelper.insertTransaction(_transaction);
       Navigator.pop(context, true);
+    }
+  }
+
+  Future<dynamic> cropImage(pickedFile) async {
+    if (pickedFile != null) {
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: pickedFile.path,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio16x9
+        ],
+        uiSettings: [
+          AndroidUiSettings(
+              toolbarTitle: 'Cropper',
+              toolbarColor: Colors.deepOrange,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          IOSUiSettings(
+            title: 'Cropper',
+          ),
+          WebUiSettings(
+            context: context,
+          ),
+        ],
+      );
+      if (croppedFile!.path.isNotEmpty) {
+        return File(croppedFile.path as String);
+      }
+    }
+    return null;
+  }
+
+  /// Get from device
+  _getImageFromDevice([ImageSource? imgSrc]) async {
+    var pickedFile = (await ImagePicker().pickImage(
+      source: imgSrc ?? ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    ));
+    File? croppedFile = await cropImage(pickedFile);
+    if (croppedFile != null) {
+      setState(() => imageFile = File(croppedFile.path as String));
     }
   }
 
@@ -143,7 +200,9 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                 AmountTextFormField(
                     initialAmountController: initialAmountController),
                 DropdownButtonFormField(
-                  value: walletController.text.isNotEmpty ?  walletController.text : null,
+                  value: walletController.text.isNotEmpty
+                      ? walletController.text
+                      : null,
                   items: wallets.map((item) {
                     return DropdownMenuItem<String>(
                       value: item.id,
@@ -212,7 +271,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                 ),
                 ElevatedButton(
                   onPressed: _onAddTransactionCategory,
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [Icon(Icons.add), Text('Add new Category')],
                   ),
@@ -247,6 +306,59 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                     border: UnderlineInputBorder(),
                     labelText: "Select datetime",
                   ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                          width: 1.0, color: Theme.of(context).disabledColor),
+                    ),
+                    color: Colors.white,
+                  ),
+                  child: Column(children: [
+                    const Row(
+                      children: [
+                        Text('Upload an image'),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _getImageFromDevice();
+                          },
+                          child: Text("PICK FROM GALLERY",
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.primary)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _getImageFromDevice(ImageSource.camera);
+                          },
+                          child: Text("PICK FROM CAMERA",
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.primary)),
+                        )
+                      ],
+                    ),
+                    imageFile != null
+                        ? Container(
+                            child: Image.file(
+                              imageFile!,
+                              fit: BoxFit.contain,
+                              width: 400,
+                              height: 400,
+                            ),
+                          )
+                        : Container(),
+                  ]),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -290,7 +402,7 @@ class AmountTextFormField extends StatelessWidget {
         );
       },
       validator: (value) {
-        if (value == null || value.isEmpty) {
+        if (value == null || value.isEmpty || value == '0') {
           return 'Required';
         }
         return null;

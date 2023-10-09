@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
@@ -69,6 +72,44 @@ class _TransactionPageState extends State<TransactionPage> {
         getTransactions();
       }
     });
+  }
+
+  void _onViewImage(String? base64Image) {
+    if (base64Image == null) return;
+
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+          child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          color: Colors.white,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Column(children: <Widget>[
+                const SizedBox(height: 15),
+                Container(
+                  width: double.infinity,
+                  height: 500,
+                  child: PhotoView(
+                    imageProvider:
+                        Image.memory(const Base64Decoder().convert(base64Image!))
+                            .image,
+                    enableRotation: true,
+                  ),
+                ),
+                const SizedBox(height: 15),
+              ]),
+            ],
+          ),
+        ),
+      )),
+    );
   }
 
   @override
@@ -173,17 +214,43 @@ class _TransactionPageState extends State<TransactionPage> {
                       child: Column(
                         children: [
                           ListTile(
-                              title: Padding(
-                                padding: EdgeInsets.all(1),
-                                child: TransactionCard(
-                                    transaction: item, onPressed: () => {}),
-                              ),
-                              // leading: const CircleAvatar(
-                              //   // Display the Flutter Logo image asset.
-                              //   foregroundImage: AssetImage(
-                              //       'assets/images/flutter_logo.png'),
-                              // ),
-                              onTap: () {}),
+                            title: Padding(
+                              padding: EdgeInsets.all(1),
+                              child: TransactionCard(
+                                  transaction: item, onPressed: () => {}),
+                            ),
+                            leading: Container(
+                                width: 50,
+                                height: 50,
+                                child: item.base64Image == null
+                                    ? const CircleAvatar(
+                                        // Display the Flutter Logo image asset.
+                                        radius: 2,
+                                        foregroundImage: AssetImage(
+                                            'assets/images/flutter_logo.png'),
+                                      )
+                                    : Image.memory(const Base64Decoder()
+                                        .convert(item.base64Image!))
+                                // PhotoView(
+                                //     imageProvider: Image.memory(
+                                //             const Base64Decoder()
+                                //                 .convert(item.base64Image!))
+                                //         .image,
+                                //     enableRotation: true,
+                                //   ),
+                                ),
+                            //  const CircleAvatar(
+                            //     // Display the Flutter Logo image asset.
+                            //     // radius: 2,
+                            //     foregroundImage: AssetImage(
+                            //   base64Decode(item.imageBytes as Uint8List),
+                            // )
+                            //     //  AssetImage(
+                            //     //     'assets/images/flutter_logo.png'),
+                            //     ),
+                            // onTap: () {}
+                            onTap: () => _onViewImage(item.base64Image),
+                          ),
                         ],
                       ),
                     );

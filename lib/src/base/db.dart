@@ -55,7 +55,7 @@ class DbHelper {
         categoryId text,
         description text,
         dateTime TIMESTAMP,
-        imgUrl text
+        base64Image text
       )
       """);
 

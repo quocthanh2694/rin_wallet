@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class WalletTransaction {
   late String id;
   late String walletId;
@@ -6,9 +8,10 @@ class WalletTransaction {
   late String categoryId;
 
   // optional
+  String? base64Image;
   String? description = '';
   String? dateTime = DateTime.now().toString();
-  List<String>? imgUrl = [];
+  // List<String>? imgUrl = [];
 
   WalletTransaction({
     required this.id,
@@ -17,8 +20,9 @@ class WalletTransaction {
     required this.walletTransactionTypeId,
     required this.categoryId,
     this.description = '',
-    this.imgUrl = const [],
+    // this.imgUrl = const [],
     this.dateTime,
+    this.base64Image,
   }) {}
 
   Map<String, dynamic> toMap() {
@@ -28,8 +32,9 @@ class WalletTransaction {
     map["walletTransactionTypeId"] = walletTransactionTypeId;
     map["categoryId"] = categoryId;
     map["description"] = description;
-    map["imgUrl"] = imgUrl;
+    // map["imgUrl"] = imgUrl;
     map["dateTime"] = dateTime.toString();
+    map["base64Image"] = base64Image;
     if (id != null) {
       map["id"] = id;
     }
@@ -45,9 +50,10 @@ class WalletTransaction {
     categoryId = o["categoryId"];
     description = o["description"].toString();
     dateTime = o["dateTime"];
-    imgUrl = List.generate(o["imgUrl"].length, (i) {
-      print(o["imgUrl"][i]);
-      return o["imgUrl"][i];
-    });
+    base64Image = o['base64Image'];
+    // imgUrl = List.generate(o["imgUrl"].length, (i) {
+    //   print(o["imgUrl"][i]);
+    //   return o["imgUrl"][i];
+    // });
   }
 }

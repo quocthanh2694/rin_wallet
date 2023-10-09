@@ -72,7 +72,7 @@ class _BottomNavigationBarMainState extends State<BottomNavigationBarMain> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
-            label: 'School',
+            label: 'Setting',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.note),

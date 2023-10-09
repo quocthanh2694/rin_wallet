@@ -166,7 +166,7 @@ class DashboardPageState extends State<DashboardPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Total withdraw amont by wallet',
+                    'Total withdraw (VND)',
                     style: TextStyle(color: Colors.black, fontSize: 20),
                   ),
                 ],
@@ -203,7 +203,7 @@ class DashboardPageState extends State<DashboardPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Transactions',
+                'Transactions (VND)',
                 style: TextStyle(color: Colors.black, fontSize: 22),
               ),
             ],
