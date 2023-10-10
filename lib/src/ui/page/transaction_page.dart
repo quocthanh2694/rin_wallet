@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:rin_wallet/src/base/db.dart';
@@ -24,6 +27,7 @@ class TransactionPage extends StatefulWidget {
 class _TransactionPageState extends State<TransactionPage> {
   // int _counter = 0;
   File? imageFile;
+  List<GroupedTransactionsByDate> groupedTransactions = [];
   final List<String> items = List.generate(20, (index) => '${index}');
   var dbHelper = new DbHelper();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
@@ -41,15 +45,28 @@ class _TransactionPageState extends State<TransactionPage> {
     });
   }
 
+  generateGroupedTransaction() {
+    List<GroupedTransactionsByDate> groupedTrans = [];
+    var groupByDate = groupBy(
+        transactions, (transaction) => transaction.dateTime!.substring(0, 10));
+
+    groupByDate.forEach((date, list) {
+      var temp = GroupedTransactionsByDate(date: date, transactions: list);
+      groupedTrans.add(temp);
+    });
+    setState(() {
+      groupedTransactions = groupedTrans;
+    });
+  }
+
   getTransactions() async {
     if (widget.walletId!.isEmpty) return;
     List<WalletTransaction> data =
         await dbHelper.getTransactions(widget.walletId!);
     setState(() {
       this.transactions = data;
+      generateGroupedTransaction();
     });
-    print('Transactions result: ');
-    print(data);
   }
 
   @override
@@ -97,9 +114,9 @@ class _TransactionPageState extends State<TransactionPage> {
                   width: double.infinity,
                   height: 500,
                   child: PhotoView(
-                    imageProvider:
-                        Image.memory(const Base64Decoder().convert(base64Image!))
-                            .image,
+                    imageProvider: Image.memory(
+                            const Base64Decoder().convert(base64Image!))
+                        .image,
                     enableRotation: true,
                   ),
                 ),
@@ -115,162 +132,192 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const BaseAppBar(title: 'Transaction'), // wallet?.name),
-      body: Column(
-        children: [
-          wallet == null
-              ? Container(
-                  height: 0,
-                  child: null,
-                )
-              : Container(
-                  height: 100,
-                  child: WalletCard(wallet: wallet!, onPressed: () => {})),
-          Text(
-            'Transactions:',
-          ),
-          Expanded(
-            child: RefreshIndicator(
-                key: _refreshIndicatorKey,
-                strokeWidth: 4.0,
-                onRefresh: () async {
-                  getWalletById();
-                  getTransactions();
-                },
+        appBar: const BaseAppBar(title: 'Transaction'), // wallet?.name),
+        body: RefreshIndicator(
+          key: _refreshIndicatorKey,
+          strokeWidth: 4.0,
+          onRefresh: () async {
+            getWalletById();
+            getTransactions();
+          },
+          child: Column(
+            children: [
+              wallet == null
+                  ? Container(
+                      height: 0,
+                      child: null,
+                    )
+                  : Container(
+                      height: 100,
+                      child: WalletCard(wallet: wallet!, onPressed: () => {})),
+              const Text(
+                'Transactions:',
+              ),
+              Expanded(
                 child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  restorationId: 'transactionPageList',
-                  itemCount: transactions.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final item = transactions[index];
+                    shrinkWrap: true,
+                    // physics: const ClampingScrollPhysics(),
+                    itemCount: groupedTransactions.length,
+                    itemBuilder: (BuildContext context, int groupedIndex) {
+                      final groupedTran = groupedTransactions[groupedIndex];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("${groupedTran.date}"),
+                          ),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: ClampingScrollPhysics(),
+                            // physics: ScrollPhysics(),
+                            // physics: const AlwaysScrollableScrollPhysics(),
+                            restorationId: 'transactionPageList',
+                            itemCount: groupedTran.transactions.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final item = groupedTran.transactions[index];
 
-                    return Dismissible(
-                      // Each Dismissible must contain a Key. Keys allow Flutter to
-                      // uniquely identify widgets.
-                      direction: DismissDirection.startToEnd,
-                      key: Key(item.id),
-                      // Provide a function that tells the app
-                      // what to do after an item has been swiped away.
-                      confirmDismiss: (DismissDirection direction) async {
-                        return await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text("Confirm"),
-                              content: const Text(
-                                  "Are you sure you wish to delete this item?"),
-                              actions: <Widget>[
-                                TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    child: const Text("DELETE")),
-                                MaterialButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text("CANCEL"),
+                              return Dismissible(
+                                // Each Dismissible must contain a Key. Keys allow Flutter to
+                                // uniquely identify widgets.
+                                direction: DismissDirection.startToEnd,
+                                key: Key(item.id),
+                                // Provide a function that tells the app
+                                // what to do after an item has been swiped away.
+                                confirmDismiss:
+                                    (DismissDirection direction) async {
+                                  return await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text("Confirm"),
+                                        content: const Text(
+                                            "Are you sure you wish to delete this item?"),
+                                        actions: <Widget>[
+                                          TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: const Text("DELETE")),
+                                          MaterialButton(
+                                            onPressed: () =>
+                                                Navigator.of(context)
+                                                    .pop(false),
+                                            child: const Text("CANCEL"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                onDismissed: (direction) async {
+                                  // Remove the item from the data source.
+                                  setState(() {
+                                    transactions.removeAt(index);
+                                  });
+
+                                  await dbHelper.deleteTransaction(
+                                      item.id, item);
+
+                                  // Then show a snackbar.
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text('Deleted successfull!')));
+
+                                  // get wallet for update amount
+                                  getWalletById();
+                                },
+                                // Show a red background as the item is swiped away.
+                                background: Container(
+                                  color: Colors.red,
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Center(
+                                            child: Text(
+                                          'Delete',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .apply(
+                                                  bodyColor: Theme.of(context)
+                                                      .dialogBackgroundColor)
+                                              .headlineSmall,
+                                        )),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      onDismissed: (direction) async {
-                        // Remove the item from the data source.
-                        setState(() {
-                          transactions.removeAt(index);
-                        });
-
-                        await dbHelper.deleteTransaction(item.id, item);
-
-                        // Then show a snackbar.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Deleted successfull!')));
-
-                        // get wallet for update amount
-                        getWalletById();
-                      },
-                      // Show a red background as the item is swiped away.
-                      background: Container(
-                        color: Colors.red,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(
-                                  child: Text(
-                                'Delete',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .apply(
-                                        bodyColor: Theme.of(context)
-                                            .dialogBackgroundColor)
-                                    .headlineSmall,
-                              )),
-                            ),
-                          ],
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            title: Padding(
-                              padding: EdgeInsets.all(1),
-                              child: TransactionCard(
-                                  transaction: item, onPressed: () => {}),
-                            ),
-                            leading: Container(
-                                width: 50,
-                                height: 50,
-                                child: item.base64Image == null
-                                    ? const CircleAvatar(
-                                        // Display the Flutter Logo image asset.
-                                        radius: 2,
-                                        foregroundImage: AssetImage(
-                                            'assets/images/flutter_logo.png'),
-                                      )
-                                    : Image.memory(const Base64Decoder()
-                                        .convert(item.base64Image!))
-                                // PhotoView(
-                                //     imageProvider: Image.memory(
-                                //             const Base64Decoder()
-                                //                 .convert(item.base64Image!))
-                                //         .image,
-                                //     enableRotation: true,
-                                //   ),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Padding(
+                                        padding: EdgeInsets.all(1),
+                                        child: TransactionCard(
+                                            transaction: item,
+                                            onPressed: () => {}),
+                                      ),
+                                      leading: Container(
+                                          width: 50,
+                                          height: 50,
+                                          child: item.base64Image == null
+                                              ? const CircleAvatar(
+                                                  // Display the Flutter Logo image asset.
+                                                  radius: 2,
+                                                  foregroundImage: AssetImage(
+                                                      'assets/images/flutter_logo.png'),
+                                                )
+                                              : Image.memory(
+                                                  const Base64Decoder().convert(
+                                                      item.base64Image!))
+                                          // PhotoView(
+                                          //     imageProvider: Image.memory(
+                                          //             const Base64Decoder()
+                                          //                 .convert(item.base64Image!))
+                                          //         .image,
+                                          //     enableRotation: true,
+                                          //   ),
+                                          ),
+                                      //  const CircleAvatar(
+                                      //     // Display the Flutter Logo image asset.
+                                      //     // radius: 2,
+                                      //     foregroundImage: AssetImage(
+                                      //   base64Decode(item.imageBytes as Uint8List),
+                                      // )
+                                      //     //  AssetImage(
+                                      //     //     'assets/images/flutter_logo.png'),
+                                      //     ),
+                                      // onTap: () {}
+                                      onTap: () =>
+                                          _onViewImage(item.base64Image),
+                                    ),
+                                  ],
                                 ),
-                            //  const CircleAvatar(
-                            //     // Display the Flutter Logo image asset.
-                            //     // radius: 2,
-                            //     foregroundImage: AssetImage(
-                            //   base64Decode(item.imageBytes as Uint8List),
-                            // )
-                            //     //  AssetImage(
-                            //     //     'assets/images/flutter_logo.png'),
-                            //     ),
-                            // onTap: () {}
-                            onTap: () => _onViewImage(item.base64Image),
+                              );
+                            },
                           ),
                         ],
-                      ),
-                    );
-                  },
-                )),
+                      );
+                    }),
+              ),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createTransaction,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(100),
-                bottomLeft: Radius.circular(100),
-                bottomRight: Radius.circular(100),
-                topLeft: Radius.circular(100))),
-      ),
-    );
+        ),
+        // floatingActionButtonAnimator: NoScalingAnimation(),
+        floatingActionButton: DraggableFab(
+          child: FloatingActionButton(
+            onPressed: _createTransaction,
+            tooltip: 'Increment',
+            child: const Icon(Icons.add),
+            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(100),
+                    bottomLeft: Radius.circular(100),
+                    bottomRight: Radius.circular(100),
+                    topLeft: Radius.circular(100))),
+          ),
+        ));
   }
 }

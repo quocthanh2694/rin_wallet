@@ -57,3 +57,11 @@ class WalletTransaction {
     // });
   }
 }
+
+class GroupedTransactionsByDate {
+  String? date;
+  List<WalletTransaction> transactions;
+
+  GroupedTransactionsByDate(
+      {required String this.date, required List<WalletTransaction> this.transactions});
+}
