@@ -61,7 +61,12 @@ class WalletTransaction {
 class GroupedTransactionsByDate {
   String? date;
   List<WalletTransaction> transactions;
+  double totalDeposit = 0;
+  double totalWithdraw = 0;
 
   GroupedTransactionsByDate(
-      {required String this.date, required List<WalletTransaction> this.transactions});
+      {required String this.date,
+      required this.transactions,
+      required this.totalWithdraw,
+      required this.totalDeposit});
 }

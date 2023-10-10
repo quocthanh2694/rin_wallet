@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:draggable_fab/draggable_fab.dart';
@@ -9,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
+import 'package:rin_wallet/src/models/transaction_type.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
 import 'package:rin_wallet/src/ui/page/add_transaction_page.dart';
 import 'package:rin_wallet/src/ui/widgets/transaction_card.dart';
 import 'package:rin_wallet/src/ui/widgets/walletCard.dart';
+import 'package:rin_wallet/src/utils/number.utils.dart';
 
 class TransactionPage extends StatefulWidget {
   TransactionPage({super.key, required this.walletId});
@@ -35,6 +35,7 @@ class _TransactionPageState extends State<TransactionPage> {
 
   Wallet? wallet;
   List<WalletTransaction> transactions = [];
+  TransactionType transactionType = TransactionType();
 
   getWalletById() async {
     if (widget.walletId!.isEmpty) return;
@@ -51,7 +52,21 @@ class _TransactionPageState extends State<TransactionPage> {
         transactions, (transaction) => transaction.dateTime!.substring(0, 10));
 
     groupByDate.forEach((date, list) {
-      var temp = GroupedTransactionsByDate(date: date, transactions: list);
+      double totalDeposit = 0;
+      double totalWithdraw = 0;
+      list.forEach((element) {
+        if (transactionType.isDeposit(element.walletTransactionTypeId)) {
+          totalDeposit += element.amount;
+        }
+        if (transactionType.isWithdraw(element.walletTransactionTypeId)) {
+          totalWithdraw += element.amount;
+        }
+      });
+      var temp = GroupedTransactionsByDate(
+          date: date,
+          transactions: list,
+          totalDeposit: totalDeposit,
+          totalWithdraw: totalWithdraw);
       groupedTrans.add(temp);
     });
     setState(() {
@@ -150,9 +165,6 @@ class _TransactionPageState extends State<TransactionPage> {
                   : Container(
                       height: 100,
                       child: WalletCard(wallet: wallet!, onPressed: () => {})),
-              const Text(
-                'Transactions:',
-              ),
               Expanded(
                 child: ListView.builder(
                     shrinkWrap: true,
@@ -165,7 +177,29 @@ class _TransactionPageState extends State<TransactionPage> {
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text("${groupedTran.date}"),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${groupedTran.date}"),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      formatNumber(trailingZero(
+                                          groupedTran.totalDeposit ?? 0.0)),
+                                      style: TextStyle(
+                                          color: Colors.green, fontSize: 16),
+                                    ),
+                                    Text(
+                                      formatNumber(trailingZero(
+                                          groupedTran.totalWithdraw ?? 0.0)),
+                                      style: TextStyle(
+                                          color: Colors.red, fontSize: 16),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                           ListView.builder(
                             shrinkWrap: true,
