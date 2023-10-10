@@ -155,7 +155,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
           ),
         ],
       );
-      if (croppedFile!.path.isNotEmpty) {
+      if (croppedFile!= null && croppedFile!.path.isNotEmpty) {
         return File(croppedFile.path as String);
       }
     }

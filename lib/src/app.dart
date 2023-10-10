@@ -6,6 +6,7 @@ import 'package:rin_wallet/src/models/appStore.dart';
 import 'package:rin_wallet/src/models/cart.dart';
 import 'package:rin_wallet/src/models/catalog.dart';
 import 'package:rin_wallet/src/ui/layout/bottomNavigationBar.dart';
+import 'package:rin_wallet/src/ui/page/login.dart';
 
 import 'sample_feature/sample_item_details_view.dart';
 import 'sample_feature/sample_item_list_view.dart';
@@ -13,7 +14,7 @@ import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     super.key,
     required this.settingsController,
@@ -22,13 +23,26 @@ class MyApp extends StatelessWidget {
   final SettingsController settingsController;
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isAuthenticated = false;
+
+  onChangeAuthenticate(bool result) {
+    setState(() {
+      isAuthenticated = result;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Glue the SettingsController to the MaterialApp.
     //
     // The ListenableBuilder Widget listens to the SettingsController for changes.
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
     return ListenableBuilder(
-      listenable: settingsController,
+      listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {
         return MultiProvider(
           providers: [
@@ -48,7 +62,6 @@ class MyApp extends StatelessWidget {
             ),
             // ChangeNotifierProxyProvider<AppStoreModel>,
 
-
             // Provider(create: (context) => AppStoreModel()),
             // ChangeNotifierProxyProvider< CartModel>(
             //   create: (context) => CartModel(),
@@ -60,7 +73,9 @@ class MyApp extends StatelessWidget {
             // ),
           ],
           child: MaterialApp(
-            home: BottomNavigationBarMain(),
+            home: isAuthenticated
+                ? BottomNavigationBarMain()
+                : LoginPage(onChangeAuthenticate: onChangeAuthenticate),
             // Providing a restorationScopeId allows the Navigator built by the
             // MaterialApp to restore the navigation stack when a user leaves and
             // returns to the app after it has been killed while running in the
@@ -93,7 +108,7 @@ class MyApp extends StatelessWidget {
             // SettingsController to display the correct theme.
             theme: ThemeData(),
             darkTheme: ThemeData.dark(),
-            themeMode: settingsController.themeMode,
+            themeMode: widget.settingsController.themeMode,
 
             // Define a function to handle named routes in order to support
             // Flutter web url navigation and deep linking.
@@ -103,7 +118,8 @@ class MyApp extends StatelessWidget {
                 builder: (BuildContext context) {
                   switch (routeSettings.name) {
                     case SettingsView.routeName:
-                      return SettingsView(controller: settingsController);
+                      return SettingsView(
+                          controller: widget.settingsController);
                     case SampleItemDetailsView.routeName:
                       return const SampleItemDetailsView();
                     case SampleItemListView.routeName:

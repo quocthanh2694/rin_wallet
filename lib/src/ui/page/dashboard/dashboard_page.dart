@@ -148,9 +148,6 @@ class DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('@@@@@@@@@@@@@@@@@@@@@@@@');
-    print(pieChartData);
-
     return Scaffold(
       appBar: const BaseAppBar(title: 'Dashboard'),
       body: ListView(children: [
