@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:rin_wallet/src/constant/constant.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
 import 'package:rin_wallet/src/models/transaction_type.dart';
-import 'package:rin_wallet/src/models/wallet.dart';
-import 'package:rin_wallet/src/ui/page/transaction_page.dart';
 import 'package:rin_wallet/src/utils/datetime.util.dart';
 import 'package:rin_wallet/src/utils/number.utils.dart';
 
@@ -14,8 +11,11 @@ class TransactionCard extends StatelessWidget {
 
   final transactionType = new TransactionType();
 
-  TransactionCard(
-      {super.key, required this.transaction, required this.onPressed});
+  TransactionCard({
+    super.key,
+    required this.transaction,
+    required this.onPressed,
+  });
   @override
   Widget build(BuildContext context) {
     if (transaction == null) return Container();
@@ -68,6 +68,17 @@ class TransactionCard extends StatelessWidget {
                 //   style: Theme.of(context).textTheme.headlineSmall,
                 // ),
               ]),
+              transaction.categoryId!.isNotEmpty
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${transaction.categoryName}",
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    )
+                  : Container(),
               transaction.description!.isNotEmpty
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.start,

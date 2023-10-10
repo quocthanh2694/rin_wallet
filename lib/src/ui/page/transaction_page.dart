@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/transaction.dart';
+import 'package:rin_wallet/src/models/transaction_category.dart';
 import 'package:rin_wallet/src/models/transaction_type.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';

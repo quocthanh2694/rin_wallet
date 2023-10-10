@@ -125,9 +125,21 @@ class DbHelper {
   //#region Transactions
   Future<List<WalletTransaction>> getTransactions(String walletId) async {
     Database db = await this.db;
-    List<Map> result = await db.rawQuery(
-        "SELECT * from transactions WHERE walletId=? ORDER BY dateTime DESC",
-        [walletId]);
+    List<Map> result = await db.rawQuery("""
+        SELECT 
+          transactions.id,
+          walletId,
+          amount,
+          walletTransactionTypeId,
+          categoryId,
+          transaction_categories.name AS categoryName,
+          description,
+          dateTime,
+          base64Image
+        FROM transactions join transaction_categories
+        WHERE transactions.categoryId = transaction_categories.id AND walletId=? 
+        ORDER BY dateTime DESC
+        """, [walletId]);
 
     List<WalletTransaction> list = List.generate(result.length, (i) {
       return WalletTransaction.fromObject(result[i]);
@@ -195,6 +207,14 @@ class DbHelper {
   //#endregion
 
   //#region Transaction categories
+  Future<TransactionCategory?> getTransactionCategoryById(String id) async {
+    Database db = await this.db;
+    List<Map> result = await db
+        .rawQuery("SELECT * from transaction_categories WHERE id=?", [id]);
+    if (result == null) return null;
+    return TransactionCategory.fromObject(result[0]);
+  }
+
   Future<List<TransactionCategory>> getTransactionCategories() async {
     Database db = await this.db;
     List<Map> result =
@@ -232,7 +252,7 @@ class DbHelper {
       where += " AND dateTime > '${fromDate}' AND dateTime < '${toDate}'";
     }
 
-print(fromDate.toString() + toDate.toString());
+    print(fromDate.toString() + toDate.toString());
     Database db = await this.db;
     List<Map> result = await db.rawQuery("""
 SELECT walletId, name as walletName, total

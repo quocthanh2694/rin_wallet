@@ -11,6 +11,7 @@ class WalletTransaction {
   String? base64Image;
   String? description = '';
   String? dateTime = DateTime.now().toString();
+  String? categoryName = '';
   // List<String>? imgUrl = [];
 
   WalletTransaction({
@@ -51,6 +52,7 @@ class WalletTransaction {
     description = o["description"].toString();
     dateTime = o["dateTime"];
     base64Image = o['base64Image'];
+    categoryName = o['categoryName'].toString();
     // imgUrl = List.generate(o["imgUrl"].length, (i) {
     //   print(o["imgUrl"][i]);
     //   return o["imgUrl"][i];
