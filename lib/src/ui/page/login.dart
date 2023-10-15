@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rin_wallet/src/services/auth.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
 
@@ -88,6 +90,10 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextFormField(
                       controller: passwordController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      textInputAction: TextInputAction.done,
                       obscureText: true,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 20),
@@ -98,14 +104,15 @@ class _LoginPageState extends State<LoginPage> {
                             textAlign: TextAlign.center,
                           ),
                           hintText: 'Enter password here'),
-                      onEditingComplete: () {
-                        if (passwordController.text == null) {
+                      onChanged: (String value) {
+                        if (value == null) {
                           return;
                         }
                         var bytes = utf8.encode(
-                            'pa9284fi304u0P*@(' + passwordController.text);
+                            'pa9284fi304u0P*@(' + value);
                         var res = md5.convert(bytes);
-                        if (res.toString() == 'e1cf77dcd65231c20dcbad0d642af14c') {
+                        if (res.toString() ==
+                            'e1cf77dcd65231c20dcbad0d642af14c') {
                           passwordController.clear();
                           if (widget.onChangeAuthenticate != null) {
                             widget.onChangeAuthenticate(true);
