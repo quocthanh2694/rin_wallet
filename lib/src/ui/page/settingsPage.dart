@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/cart.dart';
 import 'package:rin_wallet/src/models/catalog.dart';
+import 'package:rin_wallet/src/services/notificationservice.dart';
 import 'package:rin_wallet/src/services/sharedPreferences.service.dart';
 import 'package:rin_wallet/src/ui/page/walletDetailPage.dart';
 import 'package:image_cropper/image_cropper.dart';

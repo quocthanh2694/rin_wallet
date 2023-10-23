@@ -27,7 +27,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isAuthenticated = false;
+  bool isAuthenticated = true;
 
   onChangeAuthenticate(bool result) {
     setState(() {

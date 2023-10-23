@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rin_wallet/src/services/notificationservice.dart';
+import 'package:rin_wallet/src/ui/page/notification/counter_observer.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
@@ -12,6 +16,12 @@ void main() async {
   // Load the user's preferred theme while the splash screen is displayed.
   // This prevents a sudden theme change when the app is first displayed.
   await settingsController.loadSettings();
+
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  NotificationService().initNotification();
+
+  Bloc.observer = const CounterObserver();
 
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the

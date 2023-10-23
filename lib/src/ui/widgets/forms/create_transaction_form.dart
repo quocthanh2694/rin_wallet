@@ -155,7 +155,7 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
           ),
         ],
       );
-      if (croppedFile!= null && croppedFile!.path.isNotEmpty) {
+      if (croppedFile != null && croppedFile!.path.isNotEmpty) {
         return File(croppedFile.path as String);
       }
     }
@@ -229,7 +229,13 @@ class CreateTransactionFormState extends State<CreateTransactionForm> {
                   items: transactionType.getList().map((item) {
                     return DropdownMenuItem<String>(
                       value: item.id,
-                      child: Text(item.name),
+                      child: Text(
+                        item.name,
+                        style: TextStyle(
+                            color: transactionType.isDeposit(item.id)
+                                ? Colors.green
+                                : Colors.red),
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) {

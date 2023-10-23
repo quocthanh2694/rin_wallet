@@ -35,7 +35,7 @@ class WalletCard extends StatelessWidget {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    "${formatNumber(trailingZero(wallet.balance ?? 0.0))}${this.wallet.currencyUnit == '\$' ? '\$' : ''}",
+                    "${formatNumber(trailingZero((wallet.balance ?? 0.0) + (wallet.initialAmount ?? 0.0)))}${this.wallet.currencyUnit == '\$' ? '\$' : ''}",
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),

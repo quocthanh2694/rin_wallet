@@ -136,11 +136,11 @@ class DbHelper {
           description,
           dateTime,
           base64Image
-        FROM transactions join transaction_categories
-        WHERE transactions.categoryId = transaction_categories.id AND walletId=? 
+        FROM transactions left join transaction_categories 
+        ON transactions.categoryId = transaction_categories.id
+        WHERE walletId=? 
         ORDER BY dateTime DESC
         """, [walletId]);
-
     List<WalletTransaction> list = List.generate(result.length, (i) {
       return WalletTransaction.fromObject(result[i]);
     });

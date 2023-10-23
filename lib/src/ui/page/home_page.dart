@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:rin_wallet/src/base/db.dart';
 import 'package:rin_wallet/src/models/cart.dart';
@@ -9,6 +10,8 @@ import 'package:rin_wallet/src/models/catalog.dart';
 import 'package:rin_wallet/src/models/wallet.dart';
 import 'package:rin_wallet/src/ui/layout/baseAppBar.dart';
 import 'package:rin_wallet/src/ui/page/add_wallet_page.dart';
+import 'package:rin_wallet/src/ui/page/notification/counter_page/counter_page_1.dart';
+import 'package:rin_wallet/src/ui/page/notification/notification_page.dart';
 import 'package:rin_wallet/src/ui/page/walletDetailPage.dart';
 import 'package:rin_wallet/src/ui/widgets/walletCard.dart';
 
@@ -90,7 +93,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const BaseAppBar(title: 'Home'),
+        appBar: BaseAppBar(
+          title: 'Home',
+          actions: [
+            IconButton(
+              icon: Icon(Icons.notifications_rounded),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // builder: (context) => const CounterPage()),
+                  builder: (context) => const NotificationPage()),
+                );
+              },
+            )
+          ],
+        ),
         body: RefreshIndicator(
           key: _refreshIndicatorKey,
           // color: Colors.white,
