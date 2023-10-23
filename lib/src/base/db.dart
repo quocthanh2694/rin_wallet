@@ -137,7 +137,7 @@ class DbHelper {
           dateTime,
           base64Image
         FROM transactions left join transaction_categories 
-        ON transactions.categoryId = transaction_categories.id
+          ON transactions.categoryId = transaction_categories.id
         WHERE walletId=? 
         ORDER BY dateTime DESC
         """, [walletId]);

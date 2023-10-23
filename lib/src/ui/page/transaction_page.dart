@@ -51,7 +51,8 @@ class _TransactionPageState extends State<TransactionPage> {
     List<GroupedTransactionsByDate> groupedTrans = [];
     var groupByDate = groupBy(
         transactions, (transaction) => transaction.dateTime!.substring(0, 10));
-
+        print(transactions);
+print(groupByDate);
     groupByDate.forEach((date, list) {
       double totalDeposit = 0;
       double totalWithdraw = 0;

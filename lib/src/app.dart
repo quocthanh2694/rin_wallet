@@ -106,7 +106,7 @@ class _MyAppState extends State<MyApp> {
             // Define a light and dark color theme. Then, read the user's
             // preferred ThemeMode (light, dark, or system default) from the
             // SettingsController to display the correct theme.
-            theme: ThemeData(),
+            theme: ThemeData(useMaterial3: true),
             darkTheme: ThemeData.dark(),
             themeMode: widget.settingsController.themeMode,
 
