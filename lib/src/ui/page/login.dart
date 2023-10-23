@@ -108,8 +108,10 @@ class _LoginPageState extends State<LoginPage> {
                         if (value == null) {
                           return;
                         }
-                        var bytes = utf8.encode(
-                            'pa9284fi304u0P*@(' + value);
+                        if (value.length != 4) {
+                          return;
+                        }
+                        var bytes = utf8.encode('pa9284fi304u0P*@(' + value);
                         var res = md5.convert(bytes);
                         if (res.toString() ==
                             'e1cf77dcd65231c20dcbad0d642af14c') {
